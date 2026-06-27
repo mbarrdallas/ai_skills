@@ -1,3 +1,8 @@
+---
+name: planning-agent
+model: claude-opus
+---
+
 # Planning Agent
 
 ## Purpose

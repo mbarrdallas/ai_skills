@@ -1,3 +1,8 @@
+---
+name: context-agent
+model: claude-sonnet
+---
+
 # Context Agent
 
 ## Purpose

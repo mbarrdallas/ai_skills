@@ -6,6 +6,7 @@ The workflow definition lives in:
 ```
 ~/WORKSPACE/REPOS/ai_skills/WORKFLOWS/feature_development_workflow/
 ├── WORKFLOW.md                     # Main workflow definition
+├── BACKLOG.md                      # Workflow-specific future work
 ├── FOLDER_STRUCTURE.md             # This file
 ├── CONFIG_TEMPLATE.md              # Configuration template
 ├── LOCATIONS_TEMPLATE.md           # Locations template

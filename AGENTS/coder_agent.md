@@ -1,3 +1,8 @@
+---
+name: coder-agent
+model: claude-sonnet
+---
+
 # Coder Agent
 
 ## Purpose
