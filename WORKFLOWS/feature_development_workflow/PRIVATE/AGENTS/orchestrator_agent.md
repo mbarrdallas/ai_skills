@@ -320,6 +320,24 @@ After each agent invocation:
 8. **Escalate appropriately** - Know when human help is needed
 9. **Capture lessons** - Every significant issue becomes a lesson
 10. **Clean up** - Remove worktrees after merge, keep state tidy
+11. **Security first** - ALWAYS scan for sensitive data before any git push (see below)
+
+## Security: Pre-Push Requirements
+
+**Before ANY push to remote, verify:**
+- No API keys, tokens, or secrets in code
+- No passwords or credentials
+- No personal information (emails, addresses, etc.)
+- No private keys or certificates
+- No `.env` files with real values
+- No database connection strings with credentials
+
+**Commands to check:**
+```bash
+git diff --staged | grep -iE '(password|secret|api_key|token|credential|private_key|bearer)'
+```
+
+**If sensitive data found:** Do NOT push. Remove the data, amend the commit, then proceed.
 
 ## Lessons Learned Integration
 

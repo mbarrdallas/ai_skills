@@ -416,6 +416,46 @@ git branch -d feature/my-feature
 git push origin --delete feature/my-feature
 ```
 
+## Security: Pre-Push Checklist
+
+**ALWAYS check before pushing to any remote branch:**
+
+```bash
+# Review what you're about to commit
+git diff --staged
+
+# Search for common sensitive patterns
+git diff --staged | grep -iE '(password|secret|api_key|token|credential|private_key)'
+```
+
+**Never commit:**
+- API keys or tokens
+- Passwords or secrets
+- Private keys (SSH, SSL, etc.)
+- `.env` files with real values
+- Personal information (emails, addresses, etc.)
+- Database connection strings with credentials
+- AWS/GCP/Azure credentials
+
+**Use `.gitignore`:**
+```gitignore
+.env
+.env.*
+*.pem
+*.key
+credentials.json
+secrets/
+```
+
+**If accidentally committed:**
+```bash
+# Remove from history (if not pushed)
+git reset --soft HEAD~1
+# Edit out the sensitive data, then recommit
+
+# If already pushed - rotate the exposed credentials immediately!
+```
+
 ## Best Practices
 
 ### Daily Workflow
@@ -423,8 +463,9 @@ git push origin --delete feature/my-feature
 1. Pull latest develop before starting
 2. Work in feature branch (or worktree)
 3. Commit frequently with good messages
-4. Push at end of day (backup)
-5. Create PR when ready
+4. **Review diff for sensitive data before pushing**
+5. Push at end of day (backup)
+6. Create PR when ready
 
 ### Branch Hygiene
 
