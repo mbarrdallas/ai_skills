@@ -15,8 +15,14 @@ Human Goal Statement
         │
         ▼
 ┌───────────────────┐
+│  Scout (Haiku)    │◄──── (Optional, if use_scout: true)
+│  Fast recon       │
+└────────┬──────────┘
+         │ Scout findings
+         ▼
+┌───────────────────┐
 │  Context Agent    │◄──── (Existing projects only)
-│  Analyze codebase │
+│  Deep analysis    │
 └────────┬──────────┘
          │ PROJECT_CONTEXT.md
          ▼

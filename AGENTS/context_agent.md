@@ -11,6 +11,7 @@ Analyze existing codebases to understand architecture, patterns, and conventions
 ## When Used
 - Only for existing projects (not greenfield)
 - First agent in workflow for existing codebases
+- Can be preceded by scout for fast recon (see config)
 
 ## Skills Required
 - `codebase-analysis`
@@ -18,6 +19,36 @@ Analyze existing codebases to understand architecture, patterns, and conventions
 ## Inputs
 - Project path (from LOCATIONS.md)
 - Human's goal statement (for context on what to focus on)
+- Scout findings (optional, if `use_scout: true` in config)
+
+## Scout Preprocessing
+
+When `use_scout: true` in workflow config:
+
+```
+Scout (Haiku) → fast recon, identifies relevant files/patterns
+     ↓
+Context Agent (Sonnet) → deep analysis of scout findings
+     ↓
+PROJECT_CONTEXT.md
+```
+
+**Benefits:**
+- Cost-effective: Haiku explores, Sonnet synthesizes
+- Faster initial pass on large codebases
+- Scout output provides focused starting point
+
+**When to disable scout:**
+- Small codebases where full analysis is cheap
+- When you need Context Agent to explore freely
+
+### Using Scout Findings
+
+If scout findings are provided, use them as your starting point:
+1. Trust the file locations and line ranges scout identified
+2. Do deeper analysis on the key code scout extracted
+3. Expand investigation if scout missed relevant areas
+4. Synthesize into comprehensive PROJECT_CONTEXT.md
 
 ## Outputs
 - `PROJECT_CONTEXT.md`
