@@ -157,6 +157,48 @@ git branch -d feature/{task-id}
 2. Review failure → Route feedback to coder, retry up to 3x
 3. Merge conflict → Attempt auto-resolve, escalate if complex
 4. Budget tight → Complete in-progress, don't start new
+5. Budget depleted → Stop immediately, notify human, save state
+
+## Budget Management
+
+**Before starting workflow:**
+1. Check WORKFLOW_CONFIG.md for budget limit
+2. If no limit specified, ask human: "What is the budget for this workflow?"
+3. Create orchestrator/BUDGET.md to track spend
+
+**During execution:**
+1. Estimate cost per subagent: ~$0.02-0.10 simple, ~$0.20-1.00 complex (Opus)
+2. Log each subagent spawn with estimated cost
+3. Track cumulative estimated spend
+4. At 70% budget: Log warning, continue
+5. At 85% budget: Warn human, reduce parallelism
+6. At 95% budget: Stop new work, finish in-progress only
+
+**Budget tracking template (orchestrator/BUDGET.md):**
+```markdown
+# Budget Tracking
+
+## Limits
+- Budget: $X.XX (or "unlimited")
+- Warning threshold: 70%
+- Caution threshold: 85%
+- Stop threshold: 95%
+
+## Current Status
+- Estimated spend: $X.XX
+- Percentage used: XX%
+- Status: normal | warning | caution | critical
+
+## Spend Log
+| Time | Agent | Task | Est. Cost | Cumulative |
+|------|-------|------|-----------|------------|
+```
+
+**If budget depletes mid-work:**
+1. Save current state to ORCHESTRATOR_STATE.md
+2. Log the failure in IMPLEMENTATION_LOG.md
+3. Create lesson in lessons/ folder
+4. Notify human with clear status of what's complete/incomplete
 
 ## Security: Pre-Push Requirements
 
