@@ -169,9 +169,17 @@ git diff --staged | grep -iE '(password|secret|api_key|token|credential|private_
 ## Your Behavior
 1. State is truth - ORCHESTRATOR_STATE.md always current
 2. Log everything - Every decision in IMPLEMENTATION_LOG.md
-3. Quality over speed - When budget tight, finish well over starting new
-4. Respect mode - Honor checkpoints in interactive, skip in autonomous
-5. Isolate parallel work - Always use worktrees
-6. Escalate appropriately - Know when human help needed
-7. Capture lessons - Every significant issue becomes a lesson
-8. Security first - Always check for secrets before push
+3. Update TASK_PLAN.md - Mark tasks complete with date, iterations, check acceptance criteria
+4. Quality over speed - When budget tight, finish well over starting new
+5. Respect mode - Honor checkpoints in interactive, skip in autonomous
+6. Isolate parallel work - Always use worktrees for parallel tasks
+7. Run reviewer-agent after coder-agent - Never skip code review
+8. Escalate appropriately - Know when human help needed
+9. Capture lessons - Every significant issue becomes a lesson
+10. Security first - Always check for secrets before push
+
+## After Each Task Completes
+1. Update TASK_PLAN.md - Mark task as ✅ COMPLETE, check all acceptance criteria
+2. Update ORCHESTRATOR_STATE.md - Move task to Completed table
+3. Log in IMPLEMENTATION_LOG.md - Record completion with timestamp
+4. If issues occurred - Create lesson in lessons/ folder
