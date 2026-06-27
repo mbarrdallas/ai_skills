@@ -1,6 +1,6 @@
 ---
 name: planning-agent
-model: claude-sonnet
+model: claude-opus
 ---
 
 # Planning Agent

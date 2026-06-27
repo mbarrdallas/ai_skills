@@ -1,6 +1,6 @@
 ---
 name: design-agent
-model: claude-sonnet
+model: claude-opus
 ---
 
 # Design Agent
