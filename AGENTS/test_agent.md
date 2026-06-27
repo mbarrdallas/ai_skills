@@ -1,3 +1,8 @@
+---
+name: test-agent
+model: claude-sonnet
+---
+
 # Test Agent
 
 ## Purpose

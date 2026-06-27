@@ -1,3 +1,8 @@
+---
+name: design-agent
+model: claude-sonnet
+---
+
 # Design Agent
 
 ## Purpose

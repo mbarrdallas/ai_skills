@@ -1,3 +1,8 @@
+---
+name: documentation-agent
+model: claude-sonnet
+---
+
 # Documentation Agent
 
 ## Purpose

@@ -1,3 +1,8 @@
+---
+name: reviewer-agent
+model: claude-sonnet
+---
+
 # Reviewer Agent
 
 ## Purpose

@@ -1,3 +1,8 @@
+---
+name: requirements-agent
+model: claude-sonnet
+---
+
 # Requirements Agent
 
 ## Purpose

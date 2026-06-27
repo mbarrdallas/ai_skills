@@ -1,3 +1,8 @@
+---
+name: planning-agent
+model: claude-sonnet
+---
+
 # Planning Agent
 
 ## Purpose

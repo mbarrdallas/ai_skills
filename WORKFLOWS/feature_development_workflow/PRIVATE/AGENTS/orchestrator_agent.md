@@ -1,3 +1,8 @@
+---
+name: feature-development-orchestrator
+model: claude-opus
+---
+
 # Feature Development Workflow Orchestrator
 
 ## Purpose
