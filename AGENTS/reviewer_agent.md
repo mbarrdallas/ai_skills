@@ -3,6 +3,7 @@ name: reviewer-agent
 description: Validate code against design requirements, coding standards, and quality criteria
 tools: read, write, bash, grep, find, ls
 skills: coding-conventions, codebase-analysis
+spawns: none
 model: claude-sonnet-4-5
 ---
 
@@ -106,3 +107,9 @@ Any additional observations:
 - Max 3 iterations per task
 - If still failing after 3, escalate to orchestrator
 - Each iteration should make progress
+
+## Completion
+When finished, return one of:
+- `DONE` - work completed successfully, code approved
+- `CHANGES_REQUESTED` - code needs fixes, see review document
+- `BLOCKED needs: <description>` - cannot proceed, explain what's needed

@@ -3,6 +3,7 @@ name: context-agent
 description: Analyze existing codebases to understand architecture, patterns, and conventions before feature development
 tools: read, grep, find, ls, bash, write
 skills: codebase-analysis
+spawns: none
 model: claude-sonnet-4-5
 ---
 
@@ -83,3 +84,8 @@ Anything an agent should know before modifying this codebase:
 3. Note any technical debt or areas of concern
 4. Be thorough but concise - this document guides all downstream agents
 5. If uncertain about conventions, note the uncertainty
+
+## Completion
+When finished, return one of:
+- `DONE` - work completed successfully
+- `BLOCKED needs: <description>` - cannot proceed, explain what's needed

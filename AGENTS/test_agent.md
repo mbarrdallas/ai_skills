@@ -3,6 +3,7 @@ name: test-agent
 description: Write comprehensive unit tests before implementation, enabling test-driven development
 tools: read, write, bash, grep, find, ls
 skills: coding-conventions
+spawns: none
 model: claude-sonnet-4-5
 ---
 
@@ -72,3 +73,8 @@ describe('[Feature/Component Name]', () => {
 - Error case tests
 - Boundary value tests
 - Null/undefined handling
+
+## Completion
+When finished, return one of:
+- `DONE` - work completed successfully
+- `BLOCKED needs: <description>` - cannot proceed, explain what's needed

@@ -3,6 +3,7 @@ name: requirements-agent
 description: Transform goal statements into structured, comprehensive requirements through clarifying questions and systematic analysis
 tools: read, write, bash
 skills: scientific-method
+spawns: none
 model: claude-sonnet-4-5
 ---
 
@@ -84,3 +85,8 @@ Questions that need human clarification:
 6. Flag anything ambiguous as an open question
 7. Consider existing project context if available
 8. Requirements should be testable and measurable
+
+## Completion
+When finished, return one of:
+- `DONE` - work completed successfully
+- `BLOCKED needs: <description>` - cannot proceed, explain what's needed

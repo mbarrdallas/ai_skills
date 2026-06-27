@@ -3,6 +3,7 @@ name: documentation-agent
 description: Generate comprehensive documentation including READMEs, API docs, and developer guides
 tools: read, write, grep, find, ls, bash
 skills: doc-creator
+spawns: none
 model: claude-sonnet-4-5
 ---
 
@@ -133,3 +134,8 @@ Common issues and solutions.
 - [ ] Installation instructions complete
 - [ ] No broken links
 - [ ] Consistent formatting
+
+## Completion
+When finished, return one of:
+- `DONE` - work completed successfully
+- `BLOCKED needs: <description>` - cannot proceed, explain what's needed

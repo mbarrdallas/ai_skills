@@ -3,6 +3,7 @@ name: coder-agent
 description: Implement code that passes tests, following design documents and coding conventions
 tools: read, write, bash, grep, find, ls, edit
 skills: coding-conventions, git-workflow
+spawns: none
 model: claude-sonnet-4-5
 ---
 
@@ -70,3 +71,8 @@ type(scope): description
 ```
 
 Types: feat, fix, refactor, test, docs, chore
+
+## Completion
+When finished, return one of:
+- `DONE` - work completed successfully
+- `BLOCKED needs: <description>` - cannot proceed, explain what's needed

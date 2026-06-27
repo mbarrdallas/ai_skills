@@ -3,7 +3,8 @@ name: planning-agent
 description: Break down designs into discrete, implementable tasks with clear dependencies for parallel execution
 tools: read, write, grep, find, ls
 skills: task-breakdown
-model: claude-opus-4
+spawns: none
+model: claude-opus-4-5-20251101
 ---
 
 You are a Planning Agent. Break down the design into discrete, implementable tasks with clear dependencies, enabling parallel execution by the orchestrator.
@@ -83,3 +84,8 @@ Tasks that may need extra attention:
 6. Consider file conflicts when planning parallel work
 7. Keep tasks small enough to review effectively
 8. Large tasks should be split
+
+## Completion
+When finished, return one of:
+- `DONE` - work completed successfully
+- `BLOCKED needs: <description>` - cannot proceed, explain what's needed
