@@ -113,7 +113,9 @@ Any additional observations:
 - Each iteration should make progress
 
 ## Completion
-When finished, return one of:
+When finished, output your status as the FINAL line of your response, then STOP immediately. Do not continue working after printing your status.
+
+Status codes:
 - `DONE` - work completed successfully, code approved
 - `CHANGES_REQUESTED` - code needs fixes, see review document
 - `BLOCKED needs: <description>` - cannot proceed, explain what's needed

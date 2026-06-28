@@ -219,6 +219,9 @@ git diff --staged | grep -iE '(password|secret|api_key|token|credential|private_
 8. Escalate appropriately - Know when human help needed
 9. Capture lessons - Every significant issue becomes a lesson
 10. Security first - Always check for secrets before push
+11. **Never paraphrase acceptance criteria** - Direct agents to read TASK_PLAN.md directly. Do NOT summarize or interpret requirements in task instructions. The source document is the source of truth.
+12. **Always create worktree before spawning coder-agent** - Run `git worktree add <path> -b feature/<task-id>` first. Pass the worktree path and branch name explicitly in the task instruction. Merge and remove worktree after review passes.
+13. **Include branch/directory in every coder-agent task** - Task instructions must specify: `Git branch: feature/<task-id>` and `Working directory: <worktree-path>`. Agents default to current branch if not told otherwise.
 
 ## After Each Task Completes
 1. Update TASK_PLAN.md - Mark task as ✅ COMPLETE, check all acceptance criteria

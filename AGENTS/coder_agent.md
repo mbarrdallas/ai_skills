@@ -77,6 +77,8 @@ type(scope): description
 Types: feat, fix, refactor, test, docs, chore
 
 ## Completion
-When finished, return one of:
+When finished, output your status as the FINAL line of your response, then STOP immediately. Do not continue working after printing your status.
+
+Status codes:
 - `DONE` - work completed successfully
 - `BLOCKED needs: <description>` - cannot proceed, explain what's needed
