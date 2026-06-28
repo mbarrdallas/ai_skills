@@ -267,6 +267,30 @@ def test_user_has_correct_properties():  # ✅ One logical thing
     assert user.is_active == True
 ```
 
+### Testing Anti-Patterns
+
+```python
+# ❌ NEVER: Placeholder assertions that always pass
+def test_user_creation():
+    # This test is useless - it passes even if code is broken
+    expect(True).toBe(True)  # or assert True
+    
+# ❌ NEVER: Commented-out test logic
+def test_user_creation():
+    # TODO: implement
+    # user = create_user(data)
+    # assert user.email == expected
+    pass
+
+# ✅ ALWAYS: Assertions that verify actual behavior
+def test_user_creation():
+    user = create_user({"email": "test@example.com"})
+    assert user.email == "test@example.com"  # Would fail if broken
+    assert user.id is not None  # Verifies real behavior
+```
+
+**Rule:** Every test must have assertions that would FAIL if the code was wrong. If a test would pass with an empty implementation, it's not a real test.
+
 ## Applying to Existing Codebases
 
 1. **First, observe** - Identify existing patterns

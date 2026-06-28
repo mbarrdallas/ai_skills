@@ -302,6 +302,37 @@ For sequential execution:
 4. Clean up
 ```
 
+## Tracking Progress
+
+When tasks complete, update the task plan:
+
+### On Task Completion
+1. Mark header with completion: `### T1: Name` → `### T1: Name ✅ COMPLETE`
+2. Check ALL acceptance criteria boxes: `- [ ]` → `- [x]`
+3. Add completion metadata:
+   ```markdown
+   - **Completed:** YYYY-MM-DD
+   - **Iterations:** N (how many review cycles)
+   ```
+4. Update any blocking relationships
+
+### Progress Visibility
+Maintain a quick-glance summary at the top:
+```markdown
+## Progress
+- Completed: 7/17 tasks (41%)
+- In Progress: T8, T9
+- Blocked: none
+```
+
+### Why This Matters
+- Provides visibility into actual progress
+- Enables accurate status reporting
+- Identifies patterns (tasks needing multiple iterations)
+- Creates audit trail for retrospectives
+
+---
+
 ## Anti-Patterns
 
 ### "And Then" Tasks
