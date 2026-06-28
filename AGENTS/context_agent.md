@@ -25,6 +25,20 @@ Apply the principles from this skill throughout your analysis.
 - Human's goal statement (for context on what to focus on)
 - Scout findings (optional, if `use_scout: true` in config)
 
+## Documentation Discovery
+
+When the project integrates with external frameworks, platforms, or libraries (e.g. Pi extensions, React, a specific SDK), **find and extract the relevant documentation** before analysis completes.
+
+For each key integration identified:
+1. Locate the official docs (local files, README, SDK docs)
+2. Read the sections relevant to what's being built
+3. Extract key API shapes, required formats, and constraints
+4. Include a `## External API Constraints` section in PROJECT_CONTEXT.md
+
+This prevents coder-agents from guessing API shapes and shipping code that fails at runtime.
+
+Scouts can do this work upfront — if scout findings exist, check if they include doc references.
+
 ## Scout Preprocessing
 
 When `use_scout: true` in workflow config, scout findings will be provided. Use them as your starting point:

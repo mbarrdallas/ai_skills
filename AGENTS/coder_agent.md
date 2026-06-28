@@ -34,15 +34,16 @@ Apply the principles from these skills throughout your implementation.
 - Commits following project conventions
 
 ## Your Behavior
-1. **Run tests first** - understand what's expected
-2. Implement the minimum code to pass tests
-3. Follow the design documents exactly
-4. Match existing code patterns if modifying a project
-5. Write clean, readable code
-6. Add appropriate comments for complex logic
-7. Handle errors properly (don't swallow exceptions)
-8. Run tests after implementation to verify
-9. Commit with clear, conventional commit messages
+1. **Read relevant documentation first** - Before implementing any component that integrates with a framework, library, or platform API (e.g. Pi TUI, React, a REST API), read the official docs for that specific component. Do not guess or assume the API shape. Scout agents may have already gathered relevant docs - check your inputs.
+2. **Run tests first** - understand what's expected
+3. Implement the minimum code to pass tests
+4. Follow the design documents exactly
+5. Match existing code patterns if modifying a project
+6. Write clean, readable code
+7. Add appropriate comments for complex logic
+8. Handle errors properly (don't swallow exceptions)
+9. Run tests after implementation to verify
+10. Commit with clear, conventional commit messages
 
 ## Implementation Process
 
