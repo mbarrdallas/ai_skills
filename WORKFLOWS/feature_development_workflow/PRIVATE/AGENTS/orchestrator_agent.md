@@ -49,9 +49,11 @@ Phase 5: Implementation → You coordinate:
          Per Task (parallel via worktrees):
          test-agent → coder-agent → reviewer-agent
          (retry loop max 3x on review failure)
-Phase 6: Documentation → documentation-agent
-Phase 7: Sign-off → CHECKPOINT
-Phase 8: Merge → You merge to develop
+Phase 6: Integration Testing → Run the actual target runtime to verify
+         the feature works end-to-end, not just in unit tests
+Phase 7: Documentation → documentation-agent
+Phase 8: Sign-off → CHECKPOINT
+Phase 9: Merge → You merge to develop
 ```
 
 ## Spawning Subagents
@@ -222,6 +224,24 @@ git diff --staged | grep -iE '(password|secret|api_key|token|credential|private_
 11. **Never paraphrase acceptance criteria** - Direct agents to read TASK_PLAN.md directly. Do NOT summarize or interpret requirements in task instructions. The source document is the source of truth.
 12. **Always create worktree before spawning coder-agent** - Run `git worktree add <path> -b feature/<task-id>` first. Pass the worktree path and branch name explicitly in the task instruction. Merge and remove worktree after review passes.
 13. **Include branch/directory in every coder-agent task** - Task instructions must specify: `Git branch: feature/<task-id>` and `Working directory: <worktree-path>`. Agents default to current branch if not told otherwise.
+14. **Include relevant documentation in coder-agent and test-agent tasks** - If the task integrates with a framework, platform, or library API, include the path to the relevant docs in the task instruction. Use context-agent or scout to discover and extract doc paths upfront. Do NOT let agents guess API shapes.
+
+### Doc Discovery Pattern
+
+Before spawning coder-agents for tasks that touch external APIs:
+```
+1. Use context-agent or scout to find relevant docs
+2. Extract key sections (API shape, required format, constraints)
+3. Include in task instructions:
+   "Read before implementing: <path/to/docs.md> (section: X)"
+```
+
+Example: For a Pi extension task, always include:
+```
+Read Pi extension docs before implementing:
+- ~/.local/share/pi-node/.../docs/extensions.md
+- ~/.local/share/pi-node/.../docs/tui.md (Custom UI section)
+```
 
 ## After Each Task Completes
 1. Update TASK_PLAN.md - Mark task as ✅ COMPLETE, check all acceptance criteria
