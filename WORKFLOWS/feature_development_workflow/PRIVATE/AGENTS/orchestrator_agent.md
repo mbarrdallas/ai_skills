@@ -160,6 +160,50 @@ git branch -d feature/{task-id}
 3. Merge conflict → Attempt auto-resolve, escalate if complex
 4. Budget tight → Complete in-progress, don't start new
 5. Budget depleted → Stop immediately, notify human, save state
+6. **Design deviation detected** → Consult design-agent before proceeding (see below)
+7. **Large or complex fix needed** → Delegate to coder-agent, do not fix inline (see below)
+
+## Design Deviation Protocol
+
+A **design deviation** occurs when:
+- A coder-agent cannot implement to spec without changing the design
+- A reviewer finds implementation doesn't match the architecture
+- Runtime failures reveal design assumptions were wrong (e.g. wrong API shape)
+- Integration with an external API requires a different approach than designed
+
+**When detected:**
+1. Stop forward progress on affected tasks
+2. Spawn design-agent with: the original design doc + the deviation + the constraint that forced it
+3. Design-agent produces updated design sections
+4. Update design docs in `design/` folder
+5. Notify affected coder/test agents via new task instructions
+6. Resume implementation with corrected design
+
+```
+Spawn design-agent task:
+"The design specifies X but runtime requires Y because Z.
+Read: design/ARCHITECTURE.md, design/API_SPEC.md
+Update the affected design sections to reflect the correct approach."
+```
+
+## Delegation Protocol
+
+The orchestrator **coordinates**, it does not implement. Any fix that is:
+- More than a one-line correction
+- Touching multiple files
+- Changing an API contract or component interface
+- Requiring understanding of a complex subsystem
+
+...must be delegated to a coder-agent with full context:
+
+```
+Spawn coder-agent task:
+"Fix: <description of issue>
+Context: <what went wrong and why>
+Read before implementing: <relevant docs paths>
+Files to change: <list>
+Tests must still pass after fix."
+```
 
 ## Budget Management
 
@@ -224,7 +268,9 @@ git diff --staged | grep -iE '(password|secret|api_key|token|credential|private_
 11. **Never paraphrase acceptance criteria** - Direct agents to read TASK_PLAN.md directly. Do NOT summarize or interpret requirements in task instructions. The source document is the source of truth.
 12. **Always create worktree before spawning coder-agent** - Run `git worktree add <path> -b feature/<task-id>` first. Pass the worktree path and branch name explicitly in the task instruction. Merge and remove worktree after review passes.
 13. **Include branch/directory in every coder-agent task** - Task instructions must specify: `Git branch: feature/<task-id>` and `Working directory: <worktree-path>`. Agents default to current branch if not told otherwise.
-14. **Include relevant documentation in coder-agent and test-agent tasks** - If the task integrates with a framework, platform, or library API, include the path to the relevant docs in the task instruction. Use context-agent or scout to discover and extract doc paths upfront. Do NOT let agents guess API shapes.
+14. **Delegate all non-trivial fixes to coder-agent** - If a fix touches more than one file, changes an API contract, or requires understanding a complex system, spawn a coder-agent. Do not fix inline in the orchestrator context. Orchestrator coordinates; it does not implement.
+15. **Consult design-agent on design deviations** - If implementation reveals that the design is wrong, incomplete, or incompatible with an external API (e.g. Pi TUI requires a factory function but design specified an object), spawn design-agent to produce an updated design before coder-agent proceeds. Do not let coder-agents improvise around design failures silently.
+16. **Include relevant documentation in coder-agent and test-agent tasks** - If the task integrates with a framework, platform, or library API, include the path to the relevant docs in the task instruction. Use context-agent or scout to discover and extract doc paths upfront. Do NOT let agents guess API shapes.
 
 ### Doc Discovery Pattern
 
