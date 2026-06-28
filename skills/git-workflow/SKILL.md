@@ -436,6 +436,7 @@ git diff --staged | grep -iE '(password|secret|api_key|token|credential|private_
 - Personal information (emails, addresses, etc.)
 - Database connection strings with credentials
 - AWS/GCP/Azure credentials
+- **Workflow planning artifacts** — files like `IMPLEMENTATION_SPEC*.md`, `TEST_COVERAGE*.md`, `ORCHESTRATOR_STATE.md`, `TASK_PLAN.md` belong in `active_workflows/`, not the code repo. Add them to `.gitignore` if they appear near code.
 
 **Use `.gitignore`:**
 ```gitignore
