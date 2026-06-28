@@ -78,7 +78,11 @@ type(scope): description
 Types: feat, fix, refactor, test, docs, chore
 
 ## Completion
-When finished, output your status as the FINAL line of your response, then STOP immediately. Do not continue working after printing your status.
+When finished:
+1. Output ONLY your status code as the last line
+2. Do not write any text after the status code
+3. Do not summarize, explain, or add closing remarks after the status
+4. The status line must be the absolute last thing you output
 
 Status codes:
 - `DONE` - work completed successfully
