@@ -263,7 +263,45 @@ git merge feature/my-feature
 | Squash | Many small/messy commits, want clean history |
 | Rebase | Linear history preferred, before PR |
 
+### Invariant: `develop` is always a descendant of `main`
+
+**Rule: `main` must always be an ancestor of `develop` (equivalently:
+`develop` is always a proper branch-off of `main`, never diverged from
+it). Nothing should ever be committed directly to `main` that isn't
+already on `develop`.**
+
+Check this invariant any time before merging:
+
+```bash
+git merge-base --is-ancestor main develop && echo OK || echo "VIOLATION: develop has diverged from main"
+```
+
+**Keep this true by preferring `--ff-only` for `develop → main` merges**,
+not `--no-ff`:
+
+```bash
+git checkout main
+git merge develop --ff-only
+git push origin main
+```
+
+`--ff-only` refuses to create a merge commit — it only succeeds if `main`
+can simply fast-forward to wherever `develop` already is. This guarantees
+`main` never accumulates a commit `develop` doesn't have, so the invariant
+holds automatically with no follow-up sync needed. If `--ff-only` fails,
+that's a signal `main` has commits `develop` lacks (see the sync procedure
+below) — don't reach for `--no-ff` on `main` just to force it through.
+
+Only use a merge commit (`--no-ff`) directly on `main` for genuine
+hotfix/release scenarios where history needs to show a distinct merge point
+— and even then, immediately sync it back to `develop` afterward (see
+below) so the invariant is restored right away, not left violated.
+
 ### Sync the source branch before merging long-lived branches back
+
+If the invariant above has already been violated (e.g. a hotfix or a
+`--no-ff` merge commit landed directly on `main`), recover it before
+continuing normal `develop → main` merges:
 
 **Rule: before merging `develop` into `main` (or any long-lived branch A
 into long-lived branch B), first check whether they've diverged. If B has
