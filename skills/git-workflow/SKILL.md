@@ -263,6 +263,58 @@ git merge feature/my-feature
 | Squash | Many small/messy commits, want clean history |
 | Rebase | Linear history preferred, before PR |
 
+### Sync the source branch before merging long-lived branches back
+
+**Rule: before merging `develop` into `main` (or any long-lived branch A
+into long-lived branch B), first check whether they've diverged. If B has
+commits A doesn't have, merge B into A first, then merge A back into B.**
+
+Two long-lived branches (`main`/`develop`, or similar) can silently diverge
+over time — e.g. a hotfix or a feature landed directly on `main` without
+ever being synced back to `develop`. If you merge `develop` into `main` in
+that state, you risk one of two bad outcomes depending on merge direction
+and tooling: `main`-only work getting overwritten/orphaned, or a confusing
+merge commit whose diff includes changes nobody intended to touch. Merging
+`main` into `develop` *first* guarantees `develop` is a strict superset of
+`main` before you merge it back — so merging `develop → main` afterward is
+guaranteed to be either a clean fast-forward or a merge that adds *only*
+the new work, with nothing dropped or reordered.
+
+**Procedure:**
+
+```bash
+# 1. Check for divergence
+git merge-base --is-ancestor main develop && echo "no divergence, safe to fast-forward/merge directly"
+git log develop..main --oneline   # commits on main that develop doesn't have
+git log main..develop --oneline   # commits on develop that main doesn't have
+
+# 2. If both logs are non-empty, they've diverged - sync first.
+#    Dry-run to confirm no real file conflicts before committing:
+git checkout develop
+git merge main --no-ff --no-commit
+git status --short          # review what would change
+git diff --cached --stat    # inspect the actual diff
+git merge --abort           # if anything looks wrong, stop here and investigate
+
+# 3. If the dry-run looked clean, do it for real:
+git merge main --no-ff -m "merge: main into develop (sync before merging develop back to main)"
+git push origin develop
+
+# 4. Now merge develop into main - guaranteed clean given step 3:
+git checkout main
+git merge develop --no-ff -m "merge: develop into main (<summary of what's landing>)"
+git push origin main
+```
+
+If branches have **not** diverged (`main` is already an ancestor of
+`develop`), skip straight to a plain fast-forward merge/push — no need for
+the sync step.
+
+This applies to solo repos just as much as team repos — it's easy for a
+single developer to merge a fix straight to `main` once and forget to sync
+it back to `develop`, and the divergence compounds silently until the next
+`develop → main` merge surfaces it.
+
 ## Conflict Resolution
 
 ### Identifying Conflicts
