@@ -1,6 +1,6 @@
 ---
 name: trigger-workflow-monitor
-description: Detect when the user wants to audit, health-check, or review a workflow's design (as distinct from wiki content or code) for process waste, inefficiency, or correctness issues, and route to workflow_monitor_workflow. Use whenever the user says things like "audit workflow X", "check this workflow for inefficiencies", "review this workflow's design", "is this workflow well-designed", "find TPS waste in this workflow", "this workflow feels inefficient/redundant", or asks to health-check/lint/improve a workflow, agent, or skill definition itself (not wiki content, not application code). Make sure to trigger this even if the user doesn't say "audit" explicitly - phrases like "this workflow has some overlap/redundancy", "clean up this workflow", or "is this workflow set up well" should also route here.
+description: Detect when the user wants to audit a REAL, RUN workflow instance under ~/WORKSPACE/active_workflows/<name>/ (did we actually learn from the lessons captured, what was the real rework rate, were expected outputs produced) - the PRIMARY use case - or, secondarily, a workflow's static design/definition (as distinct from wiki content or code) for process waste, inefficiency, or correctness issues, and route to workflow_monitor_workflow. Use whenever the user says things like "audit this workflow run/instance", "did we learn from the lessons in <name>", "check this completed workflow for waste", "audit workflow X's design", "check this workflow for inefficiencies", "is this workflow well-designed", "find TPS waste in this workflow", "this workflow feels inefficient/redundant", or asks to health-check/review/improve a workflow instance or definition itself (not wiki content, not application code). Make sure to trigger this even if the user doesn't say "audit" explicitly - phrases like "this workflow has some overlap/redundancy", "clean up this workflow", "is this workflow set up well", or "did we actually fix that" (in reference to a past lesson/incident) should also route here.
 ---
 
 # Trigger: Workflow Monitor Workflow
@@ -16,11 +16,18 @@ skill, per that workflow's own design review — see its
 
 ## When this triggers
 
-- The user wants a **workflow's own definition** reviewed for quality —
-  not its output, not wiki content, not application code. Distinguish
-  carefully:
-  - "audit `research_workflow` for redundancy" → **this workflow** (a
-    workflow *definition*).
+- **Primary case: a REAL run instance.** The user points at (or describes)
+  something under `~/WORKSPACE/active_workflows/<name>/` — a completed or
+  in-progress workflow run — and wants to know whether real waste
+  occurred, whether captured `lessons/` were actually fixed upstream, what
+  the real rework rate was, or similar. This is the higher-value case:
+  "did we actually learn from `stats_dashboard_tui`", "audit this run",
+  "check if that lesson ever got fixed".
+- **Secondary case: a workflow's own definition.** The user wants
+  `WORKFLOWS/<name>/` itself (in `ai_skills`) reviewed for quality — not
+  its output, not wiki content, not application code: "audit
+  `research_workflow` for redundancy".
+- Distinguish carefully from adjacent roles:
   - "lint my wiki" / "check the wiki for contradictions" → **NOT this** —
     that's `knowledge-lint-agent` / `llm_wiki_workflow` (wiki *content*,
     a different artifact type).
@@ -29,25 +36,29 @@ skill, per that workflow's own design review — see its
     correctness, mechanical). This workflow builds on top of that, not
     instead of it.
   - "review my code" / "check this PR" → **NOT this** — that's
-    `reviewer-agent` (application code, not a workflow definition).
+    `reviewer-agent` (application code, not a workflow instance/definition).
 - The user describes symptoms even without naming "audit" explicitly:
   redundancy/overlap between agents, an unclear handoff, a workflow that
-  "feels" inefficient or bloated, wanting to know if a workflow follows
-  good practice, or wanting a workflow health-checked/reviewed/cleaned up.
+  "feels" inefficient or bloated, wondering if a past lesson/incident was
+  ever actually resolved, or wanting a run/workflow health-checked/
+  reviewed/cleaned up.
 - The user references TPS/Lean concepts (waste, Muda, Jidoka, Kaizen, WIP,
-  "stop the line") in the context of a workflow's design specifically.
+  "stop the line") in the context of a workflow run or design.
 
 ## What to do when triggered
 
 1. Read `WORKFLOWS/workflow_monitor_workflow/WORKFLOW.md` for the full
-   operation.
-2. Identify the target workflow directory (`WORKFLOWS/<name>/`) — ask the
-   human if it's ambiguous which workflow they mean, or if they want all
-   workflows audited.
+   operation (both modes).
+2. Identify the target: a path under `~/WORKSPACE/active_workflows/<name>/`
+   (primary/instance mode) or `ai_skills/WORKFLOWS/<name>/` (secondary/
+   definition mode) — ask the human if ambiguous which they mean, or
+   whether they want all instances/workflows audited.
 3. Proceed as the `workflow-monitor-agent` role describes
-   (`AGENTS/workflow_monitor_agent.md`) — including its Jidoka prerequisite
-   (`scripts/validate_workflow.sh <target>` must not `FAIL` before a
-   design/TPS audit is useful).
+   (`AGENTS/workflow_monitor_agent.md`) — primary mode reads every
+   `lessons/*.md` and verifies fixes against the real definitions;
+   secondary mode runs its Jidoka prerequisite
+   (`scripts/validate_workflow.sh <target>` must not `FAIL`) before the
+   TPS/semantic checklist.
 
 ## Reference
 

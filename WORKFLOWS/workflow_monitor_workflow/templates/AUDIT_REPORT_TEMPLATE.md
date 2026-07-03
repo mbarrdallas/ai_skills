@@ -1,12 +1,47 @@
-# Workflow Audit — <workflow-name> — <YYYY-MM-DD>
+# Workflow Audit — <workflow-name-or-instance> — <YYYY-MM-DD>
 
-Prerequisite: `scripts/validate_workflow.sh <workflow-name>` result:
-<PASS / PASS with N warnings — paste the Summary line>
+Mode: <PRIMARY - real run instance / SECONDARY - static definition>
+
+(Secondary mode only) Prerequisite: `scripts/validate_workflow.sh <workflow-name>`
+result: <PASS / PASS with N warnings — paste the Summary line>
 
 ## Summary
 
 <1-3 sentence summary of the overall audit outcome — written last, after
 the sections below are filled in.>
+
+---
+
+## Lesson Verification (PRIMARY mode only — omit entirely for a definition audit)
+
+For every file in this instance's `lessons/`:
+
+| Lesson file | Root cause claimed | Fix claimed | Verified applied? |
+|---|---|---|---|
+| `<file>` | <summary> | <summary, or "none"> | **Applied and verified** / **Applied but unverified** / **Not applied** |
+
+For any "Applied but unverified" or "Not applied" row, add detail below:
+
+### <lesson file>: <why unverified/not applied>
+
+<Explain what the lesson claimed, what you actually found when checking
+the real shared definition, and what (if anything) still needs to happen.
+Call out explicitly if a claimed fix looks like it addressed a *symptom*
+rather than the real root cause.> Resolution: <fixed directly in the
+definition / filed to the definition's own BACKLOG.md>.
+
+## Rework Rate (PRIMARY mode only)
+
+<N> of <total> tasks required a review iteration beyond the first (based
+on `reviews/*-iteration2.md` etc. file naming). List the tasks:
+- `<task id>`: <brief reason from the review file, if discernible>
+
+## Missing Expected Outputs (PRIMARY mode only)
+
+Per the orchestrator's own documented "Your Outputs" list, check for:
+BUDGET.md, METRICS.md, ERRORS.md, SIGN_OFF.md, COMPLETION_REPORT.md. List
+any missing, and whether that looks like an intentional skip (e.g. run
+ended early) or a real gap.
 
 ---
 

@@ -94,3 +94,50 @@ off the corresponding `BACKLOG.md` item.
 
 **Related:** `audits/2026-07-03_workflow-monitor-workflow.md` (the audit
 report itself); `BACKLOG.md`'s now-checked-off "Audit Findings" entry.
+
+## 2026-07-03: Scope correction - real run instances are the primary mode, not just static definitions
+
+**Issue:** The initial design and implementation only covered auditing
+static workflow *definitions* (`WORKFLOW.md` + agents + skills, on paper).
+The human corrected this directly: the actual primary purpose should be
+analyzing **real, run workflow instances** under
+`~/WORKSPACE/active_workflows/<name>/` - the real execution evidence
+(`lessons/`, `reviews/` iteration counts, `orchestrator/` logs, missing
+expected outputs) - with definition-auditing as a secondary, supplementary
+capability, not the main point.
+
+**Learning:** Real TPS analysis is about actual process *execution*, not
+just process *design on paper* - a definition can look correct and still
+produce real waste, and (more importantly) a captured lesson can
+misdiagnose a root cause, get a plausible-looking fix applied, and the
+real defect can silently persist with nothing to catch it except checking
+against what actually happened later. Concrete proof this matters: reading
+`~/WORKSPACE/active_workflows/stats_dashboard_tui/lessons/2026-06-28-subagent-no-exit.md`
+showed it attributed subagent hangs to agent Completion-section wording
+and marked itself "Fix Applied" - but the real root cause (found
+independently, same day as this correction) was `pi-agent-dashboard`'s
+bridge extension leaving timers/WebSocket un-`unref()`'d, completely
+unrelated to instruction wording. A definition-only audit would never have
+caught that this "fixed" lesson didn't actually fix anything. Also found,
+same session: a third lesson's explicit action item ("add 'Symlink
+extension' to the feature-development sign-off checklist") was never
+actually applied to `feature_development_workflow`'s definition at all -
+confirmed by grep before any tooling existed to catch it automatically.
+
+**Improvement:** Restructured `workflow_monitor_agent.md` around two
+explicit modes: **Primary** (real instance - reads every `lessons/*.md`
+and actually verifies, against the real shared definitions, whether each
+recommended fix was made and whether it addressed the true root cause vs.
+a symptom; computes a real rework rate from `reviews/` iteration-file
+naming; checks for missing expected orchestrator outputs) and **Secondary**
+(static definition - the original TPS/Jidoka/Kaizen/semantic checklist,
+kept as-is). Added a "Cross-Referencing the Two Modes" section connecting
+them (an unaddressed instance lesson is a live Kaizen gap in the
+definition). Updated `WORKFLOW.md`, `templates/AUDIT_REPORT_TEMPLATE.md`
+(new Lesson Verification / Rework Rate / Missing Expected Outputs
+sections), and `skills/trigger-workflow-monitor/SKILL.md` to lead with the
+primary mode.
+
+**Related:** Immediately re-tested against the real
+`stats_dashboard_tui` instance after this correction - see the resulting
+audit report in `audits/` for what it actually found.
