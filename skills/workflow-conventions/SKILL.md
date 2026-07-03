@@ -225,6 +225,85 @@ agent or a workflow-`PRIVATE/AGENTS/` one (most orchestrators are private,
 since they're tightly coupled to one workflow's specific shape - see
 "Public vs. workflow-private" above).
 
+## Self-improvement logging
+
+**Rule: every agent and every workflow must be self-improving, and must log
+when it improves itself.** "Self-improving" means: when a flaw, gap,
+inefficiency, or ambiguity in an agent's or workflow's own definition is
+found (via a grilling/review pass, a lint pass, a lesson learned during
+real use, etc.), the definition gets fixed - not just noted and left for
+next time. The log exists so that history of *why* a definition looks the
+way it does isn't lost, and so a future reviewer (human or agent) can tell
+self-improvement is actually happening rather than assuming it.
+
+**Not a new format — reuses the existing `IMPROVEMENT_LOG.md` structure**
+already established for skills (see e.g. `skills/coding-conventions/IMPROVEMENT_LOG.md`,
+`skills/task-breakdown/IMPROVEMENT_LOG.md`): one entry per dated
+issue/learning/improvement, not a terse one-liner. This extends that same
+mechanism to agents and workflows (skills already had it; agents/workflows
+didn't). Named `SELF_IMPROVEMENT_LOG.md` (not `IMPROVEMENT_LOG.md`) at the
+agent/workflow scope purely to keep the two scopes distinguishable at a
+glance in a directory listing — the entry format is identical:
+
+```markdown
+## YYYY-MM-DD: <short title>
+
+**Issue:** What was wrong (a flaw, gap, ambiguity, or inefficiency found).
+
+**Learning:** What this revealed more generally.
+
+**Improvement:** What actually changed in the definition, and where.
+
+**Related:** Links/references (a grilling report, a lint finding, a lesson
+capture, a specific incident).
+```
+
+**Two tiers - one shared log per scope, not one file per agent:**
+
+- **`AGENTS/SELF_IMPROVEMENT_LOG.md`** (repo root, shared across all public
+  agents) - one entry per agent-definition change made *because* a flaw was
+  found in it (not routine feature additions - see "What counts" below).
+  Prefix each entry's title with the agent name, e.g.
+  `## 2026-07-03: research-agent - spawn interface made explicit`.
+- **`WORKFLOWS/<workflow>/SELF_IMPROVEMENT_LOG.md`** (recommended per
+  workflow, alongside `BACKLOG.md`/`FOLDER_STRUCTURE.md`) - workflow-level
+  self-improvements: `WORKFLOW.md` corrections, agents/skills added or
+  reorganized within the workflow, structural fixes found via a grilling
+  pass or a `workflow-monitor-agent` audit.
+
+Workflow-private agents/skills (`PRIVATE/AGENTS/`, `PRIVATE/SKILLS/`) log to
+their owning workflow's `SELF_IMPROVEMENT_LOG.md`, not a separate file of
+their own.
+
+**Relationship to `lesson-capture` skill:** that skill is for capturing
+lessons from a live *project* (output goes to that project's
+`active_workflows/<name>/lessons/*.md`, per `feature_development_workflow`).
+`SELF_IMPROVEMENT_LOG.md` is narrower and repo-local: specifically for
+changes to an agent's or workflow's own *definition* in `ai_skills` itself.
+A project lesson may well *cause* a `SELF_IMPROVEMENT_LOG.md` entry (e.g. a
+lesson reveals a gap in `coder-agent`'s instructions, which then gets
+fixed and logged here) — the two aren't mutually exclusive, they operate
+at different scopes.
+
+**What counts as a self-improvement entry** (log it) **vs. routine work**
+(don't log every commit):
+- Log: a grilling/review pass finds a real flaw and it gets fixed; a lint
+  pass (`knowledge-lint-agent`, `workflow-monitor-agent`) finds a structural
+  or TPS-style issue and it gets fixed; a lesson learned during real use
+  changes how an agent behaves going forward.
+- Don't log: adding a brand-new agent/workflow from scratch (that's just
+  authoring, not self-improvement of something that already existed);
+  routine content changes with no flaw being corrected.
+
+**Checked by:** `validate_agent.sh` and `validate_workflow.sh` warn (not
+fail) if `SELF_IMPROVEMENT_LOG.md` is missing at the relevant scope - a
+warning, not a hard requirement, since a brand-new agent/workflow won't
+have any self-improvement history yet by definition.
+
+See `WORKFLOWS/workflow_monitor_workflow/` for the workflow whose whole job
+is auditing other workflows (TPS-style inefficiency, correctness, and
+improvement suggestions) and driving entries into these logs.
+
 ## No hardcoded paths or credentials
 
 Applies to **workflows, agents, and skills alike**: definitions in this repo

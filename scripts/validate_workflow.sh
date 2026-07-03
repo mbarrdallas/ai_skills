@@ -106,9 +106,16 @@ validate_one_workflow() {
     warn "$name: missing FOLDER_STRUCTURE.md (recommended)"
   fi
 
+  if [ -f "$dir/SELF_IMPROVEMENT_LOG.md" ]; then
+    pass "$name: has SELF_IMPROVEMENT_LOG.md"
+  else
+    warn "$name: missing SELF_IMPROVEMENT_LOG.md (recommended - see workflow-conventions skill's 'Self-improvement logging')"
+  fi
+
   check_no_hardcoded_paths_or_credentials "$workflow_md" "$name/WORKFLOW.md"
   [ -f "$dir/BACKLOG.md" ] && check_no_hardcoded_paths_or_credentials "$dir/BACKLOG.md" "$name/BACKLOG.md"
   [ -f "$dir/FOLDER_STRUCTURE.md" ] && check_no_hardcoded_paths_or_credentials "$dir/FOLDER_STRUCTURE.md" "$name/FOLDER_STRUCTURE.md"
+  [ -f "$dir/SELF_IMPROVEMENT_LOG.md" ] && check_no_hardcoded_paths_or_credentials "$dir/SELF_IMPROVEMENT_LOG.md" "$name/SELF_IMPROVEMENT_LOG.md"
 
   if [ -d "$dir/agents" ]; then
     validate_agent_dir_entries "$dir/agents" "$name/agents"

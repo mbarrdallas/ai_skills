@@ -130,9 +130,20 @@ validate_one_agent() {
 
 targets=()
 if [ "$#" -eq 0 ]; then
+  # Repo-wide check (once, only on a full default run - not when delegated
+  # a specific file by validate_workflow.sh or a targeted single-file call):
+  # shared self-improvement log for all public agents. See workflow-conventions
+  # skill's "Self-improvement logging".
+  if [ -f "$ROOT/AGENTS/SELF_IMPROVEMENT_LOG.md" ]; then
+    pass "AGENTS/SELF_IMPROVEMENT_LOG.md exists"
+    check_no_hardcoded_paths_or_credentials "$ROOT/AGENTS/SELF_IMPROVEMENT_LOG.md" "AGENTS/SELF_IMPROVEMENT_LOG.md"
+  else
+    warn "AGENTS/SELF_IMPROVEMENT_LOG.md missing (recommended - see workflow-conventions skill's 'Self-improvement logging')"
+  fi
+
   while IFS= read -r f; do
     targets+=("$f")
-  done < <(find "$ROOT/AGENTS" -maxdepth 1 -type f -name "*.md" 2>/dev/null | sort)
+  done < <(find "$ROOT/AGENTS" -maxdepth 1 -type f -name "*.md" ! -name "SELF_IMPROVEMENT_LOG.md" 2>/dev/null | sort)
   while IFS= read -r f; do
     targets+=("$f")
   done < <(find "$ROOT/WORKFLOWS" -type f -path "*/PRIVATE/AGENTS/*.md" 2>/dev/null | sort)
