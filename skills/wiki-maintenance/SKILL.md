@@ -20,7 +20,8 @@ first — it overrides or extends anything generic described here.
 
 ## Three layers (expected in any repo using this skill)
 
-1. **`raw/`** — immutable source documents. Never edited or deleted.
+1. **`raw/`** — source documents. Never edited or deleted once ingested. See
+   "Non-text source formats" below for the convention on PDFs/docx/etc.
 2. **`wiki/`** — LLM-owned markdown pages: source summaries, entity/concept
    pages, syntheses, an index, a log. The human reads this; the LLM writes
    it.
@@ -58,6 +59,36 @@ Update `updated:` whenever a page is materially changed.
   ## [YYYY-MM-DD] lint   | <domain or "all"> | <short summary of findings>
   ```
   `grep "^## \[" wiki/log.md | tail -5` shows the last 5 entries.
+
+## Non-text source formats (PDF, docx, etc.)
+
+Sources that aren't already plain text/markdown must be converted before
+they can be read and ingested. Standard tool: **[`markitdown`](https://github.com/microsoft/markitdown)**
+(Microsoft's file-to-markdown CLI/library — handles PDF, docx, pptx, xlsx,
+images, audio, HTML, and more).
+
+**Convention: always convert to markdown and discard the original.**
+
+```bash
+markitdown "<original file>" -o raw/<domain>/<slug>.md
+```
+
+- Save the markdown output directly into `raw/<domain>/` under a
+  kebab-case slug of the original filename — this *is* the raw source going
+  forward, not a derived companion file.
+- Discard the original binary (PDF/docx/etc.) once the markdown conversion
+  is confirmed readable and reasonably faithful to the source. Do not keep
+  both.
+- Note the conversion in the source page (which tool, and that the original
+  was discarded) so provenance is clear to future readers.
+- If `markitdown` produces a garbled or clearly incomplete conversion (e.g.
+  a scanned/image-only PDF with no extractable text layer), flag this to
+  the human rather than ingesting a broken conversion — OCR or another tool
+  may be needed first.
+
+This keeps `raw/` uniformly plain-text/markdown, which is what makes it
+directly readable by any future agent session without re-running extraction
+tooling or depending on PDF/docx libraries being installed.
 
 ## Operation: Ingest
 

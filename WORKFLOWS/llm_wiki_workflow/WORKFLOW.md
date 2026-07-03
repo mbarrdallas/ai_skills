@@ -100,6 +100,12 @@ A repo using this workflow must have:
 See the `wiki-maintenance` skill for the full frontmatter/index/log
 conventions, and `templates/` in this directory for starter page templates.
 
+**Non-text sources (PDF, docx, etc.):** convert to markdown with
+[`markitdown`](https://github.com/microsoft/markitdown) and discard the
+original — `raw/` should stay uniformly plain-text/markdown. See the
+`wiki-maintenance` skill's "Non-text source formats" section for the full
+convention.
+
 ## Operations
 
 ### Ingest
