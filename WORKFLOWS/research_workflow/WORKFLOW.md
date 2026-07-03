@@ -42,7 +42,9 @@ Human: "research X"
 │     research work)  │
 │                     │
 │ 5. Ingest findings  │──spawn──▶ knowledge-ingest-agent (Ingest op)
-└────────────────────┘         via trigger-llm-wiki-workflow skill
+└────────────────────┘         (trigger-llm-wiki-workflow skill only
+                                needed if a new wiki must be scaffolded
+                                first - normal path is a direct spawn)
 ```
 
 ## Agents & Skills
@@ -102,12 +104,16 @@ anti-patterns for common ways this drifts).
 
 ### Ingest findings
 
-For findings worth preserving durably, `research-agent` applies the
-`trigger-llm-wiki-workflow` skill and spawns `knowledge-ingest-agent` to run
-its **Ingest** operation against the target wiki, exactly as it would for
-any other new source. If nothing fits any existing registered wiki, that's
-surfaced to the human explicitly (with the option to scaffold a new one via
-`trigger-llm-wiki-workflow` Case B) rather than silently dropped.
+For findings worth preserving durably (not everything qualifies — see
+`research-agent`'s explicit criteria), `research-agent` formats them as
+cited markdown and spawns `knowledge-ingest-agent` directly to run its
+**Ingest** operation against the target wiki — the same agent, treating the
+findings as pre-synthesized content rather than a raw source to summarize
+from scratch. The `trigger-llm-wiki-workflow` skill only comes into play in
+one case: if no registered wiki fits at all and a new one needs
+scaffolding first (its "Case B"). If nothing fits any existing registered
+wiki even after considering that, it's surfaced to the human explicitly
+rather than silently dropped or forced into an ill-fitting domain.
 
 ## Getting Started
 

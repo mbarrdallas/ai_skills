@@ -18,7 +18,13 @@ work) — this file is specifically about the research workflow itself.
   upgrading from this inline/single-agent shape to an async, orchestrated
   shape (parallel research threads, similar to `feature_development_workflow`'s
   worktree-based parallelism) — not needed yet at current scale.
-- [ ] Decide how `research-agent` should behave when the "Known LLM Wikis"
+- [x] Decide how `research-agent` should behave when the "Known LLM Wikis"
   registry (`~/WORKSPACE/AGENTS.md`) is stale relative to a wiki's own
-  `AGENTS.md` domain list (the registry is documented as a pointer/cache,
-  not source of truth, but there's no automated staleness check yet).
+  `AGENTS.md` domain list. (done: `research_agent.md`'s "Deciding which wiki
+  to target" step 4 now mandates always reading the target wiki's actual
+  `AGENTS.md` domain list before proceeding, never trusting the registry
+  cache alone - found via grilling critique, 2026-07-03.)
+- [ ] Automate the registry staleness check itself (e.g. a periodic script
+  that diffs `~/WORKSPACE/AGENTS.md`'s "Known LLM Wikis" table against each
+  listed wiki's actual `AGENTS.md` domain list and flags drift) - the fix
+  above is a per-invocation behavioral safeguard, not a proactive check.

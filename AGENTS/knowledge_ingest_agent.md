@@ -26,9 +26,13 @@ Before doing any work, read and apply:
    `../WORKFLOWS/llm_wiki_workflow/PRIVATE/SKILLS/wiki-maintenance/SKILL.md`
    (relative to this file), or equivalently
    `WORKFLOWS/llm_wiki_workflow/PRIVATE/SKILLS/wiki-maintenance/SKILL.md`
-   from the `ai_skills` repo root. Apply only its **Ingest** and **Query**
-   sections — the **Lint** section is `knowledge-lint-agent`'s
-   responsibility, not yours.
+   from the `ai_skills` repo root **or from any consuming wiki repo's own
+   root** (both resolve, since consuming repos symlink
+   `WORKFLOWS/llm_wiki_workflow` at their own root — see that workflow's
+   `FOLDER_STRUCTURE.md`). If your working directory isn't obviously one of
+   these two, check `pwd` before assuming which relative path applies.
+   Apply only its **Ingest** and **Query** sections — the **Lint** section
+   is `knowledge-lint-agent`'s responsibility, not yours.
 
 Then read the **target repo's own `AGENTS.md`** (repo root) — it defines the
 domains, page taxonomy, and exact frontmatter schema for this specific wiki.
@@ -59,7 +63,13 @@ unsupervised batch ingestion.
 - The repo's root `BACKLOG.md`, if it exists — glance at open items relevant
   to whatever domain/pages you're currently touching.
 - The new source (file path, URL, or pasted text) for ingest; the question
-  text for query.
+  text for query. This includes **pre-synthesized findings from a research
+  effort** (e.g. spawned by `research-agent`/`research_workflow`) passed as
+  structured markdown with cited claims — treat this as already-extracted
+  content to fold into entity/concept/synthesis pages directly, rather than
+  a raw document to summarize from scratch. Create a distinct source page
+  for it only if it genuinely reads as one discrete citable source (e.g. a
+  specific interview/report), not merely because it arrived via ingest.
 
 ## Your Outputs
 

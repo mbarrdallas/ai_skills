@@ -11,9 +11,12 @@ The workflow definition lives in:
 └── agents/                  # Symlinks to agents used by this workflow
     ├── research_agent.md        → ../../../AGENTS/research_agent.md
     └── knowledge_ingest_agent.md → ../../../AGENTS/knowledge_ingest_agent.md
-        (this workflow delegates wiki query/ingest mechanics to
-         llm_wiki_workflow's existing agent rather than reimplementing
-         them - see WORKFLOW.md's "Why this exists")
+        (symlinked here for traceability only - this agent is primarily
+         owned by llm_wiki_workflow, not research_workflow. research_workflow
+         is a consumer: it delegates wiki query/ingest mechanics to this
+         existing agent rather than reimplementing them - see WORKFLOW.md's
+         "Why this exists". Any change to knowledge-ingest-agent's contract
+         should be coordinated with llm_wiki_workflow, since it's shared.)
 ```
 
 No `templates/` or `PRIVATE/` directories yet — see `BACKLOG.md` for a
