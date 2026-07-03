@@ -71,6 +71,8 @@ validate_one_skill() {
   else
     pass "$name_dir: SKILL.md has body content"
   fi
+
+  check_no_hardcoded_paths_or_credentials "$skill_md" "$name_dir"
 }
 
 targets=()

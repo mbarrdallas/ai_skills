@@ -127,6 +127,31 @@ The same reasoning applies to agents and `PRIVATE/AGENTS/` — e.g. an
 orchestrator tightly coupled to one workflow's parallel-task/worktree shape
 belongs in `PRIVATE/AGENTS/`, not `AGENTS/`.
 
+## No hardcoded paths or credentials
+
+Applies to **workflows, agents, and skills alike**: definitions in this repo
+are shared, reusable, and get symlinked/submoduled into other repos (and
+other machines). A hardcoded absolute path or embedded credential breaks
+portability and can leak information about a specific machine or account.
+
+- **No hardcoded absolute filesystem paths** — no `/Users/<name>/...` or
+  `/home/<name>/...`. Use `~` (home-relative), paths relative to the
+  repo/workflow root, or an indirection file (e.g. a `LOCATIONS.md`-style
+  config) that the consuming repo fills in. Example paths in documentation
+  should use `~/WORKSPACE/...` or placeholders like `<repo>/...`, never a
+  literal path tied to one person's machine.
+- **No embedded credentials or secrets** — no API keys, tokens, passwords,
+  connection strings with embedded auth, or similar in `WORKFLOW.md`,
+  agent `.md` files, or `SKILL.md` files. If a workflow/agent needs a
+  credential, it should read it from the environment or a config file the
+  human sets up locally (and gitignored) — never inline it in a definition
+  that gets committed and shared.
+
+**Checked by:** all three validators (`validate_skill.sh`,
+`validate_agent.sh`, `validate_workflow.sh`) scan for both patterns and
+**fail** (not just warn) on a match — this is a hard structural rule, not a
+style preference, since these files are meant to be portable and shared.
+
 ## Validating before committing
 
 Always run the validators before committing new/changed skills, agents, or

@@ -73,3 +73,50 @@ split_csv() {
 is_kebab_case() {
   [[ "$1" =~ ^[a-z0-9]+(-[a-z0-9]+)*$ ]]
 }
+
+# check_no_hardcoded_paths_or_credentials <file> <label>
+# Scans a file for hardcoded absolute home-directory paths and
+# credential-shaped strings. FAILs (hard rule, per workflow-conventions
+# skill) rather than warning, since these break portability/leak info.
+# Increments FAIL_COUNT/PASS_COUNT directly via fail()/pass().
+check_no_hardcoded_paths_or_credentials() {
+  local file="$1" label="$2"
+  local path_matches cred_matches
+  local found=0
+
+  # Hardcoded absolute home-directory paths: /Users/<name>/... or /home/<name>/...
+  path_matches=$(grep -nE '/(Users|home)/[A-Za-z0-9_.-]+/' "$file" 2>/dev/null || true)
+  if [ -n "$path_matches" ]; then
+    found=1
+    fail "$label: hardcoded absolute home-directory path(s) found (use ~ or a relative/LOCATIONS-style reference instead):"
+    while IFS= read -r line; do
+      [ -n "$line" ] && printf "        %s\n" "$line"
+    done <<< "$path_matches"
+  fi
+
+  # Credential-shaped strings: common API key/token/secret patterns.
+  # Heuristic, not exhaustive - covers the most common accidental-leak shapes.
+  # Anchored to line-start (optionally indented) so prose/code mentioning
+  # "token"/"secret" in passing (e.g. "const token = auth.createToken(user)")
+  # doesn't false-positive - only a config/env-style "key: value" or
+  # "KEY=value" assignment at the start of a line counts. Value charset
+  # deliberately excludes '.' and '(' so dotted/function-call-shaped code
+  # examples (not literal secret values) don't match either.
+  cred_matches=$(grep -nEi \
+    -e 'AKIA[0-9A-Z]{16}' \
+    -e 'gh[pousr]_[A-Za-z0-9]{20,}' \
+    -e 'sk-[A-Za-z0-9]{20,}' \
+    -e '^[[:space:]]*(api[_-]?key|secret|token|password)[[:space:]]*[:=][[:space:]]*["'"'"']?[A-Za-z0-9/_+=-]{12,}' \
+    "$file" 2>/dev/null || true)
+  if [ -n "$cred_matches" ]; then
+    found=1
+    fail "$label: possible embedded credential/secret found (never commit real credentials in shared definitions):"
+    while IFS= read -r line; do
+      [ -n "$line" ] && printf "        %s\n" "$line"
+    done <<< "$cred_matches"
+  fi
+
+  if [ "$found" -eq 0 ]; then
+    pass "$label: no hardcoded absolute paths or embedded credentials found"
+  fi
+}

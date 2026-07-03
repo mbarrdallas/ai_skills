@@ -106,6 +106,10 @@ validate_one_workflow() {
     warn "$name: missing FOLDER_STRUCTURE.md (recommended)"
   fi
 
+  check_no_hardcoded_paths_or_credentials "$workflow_md" "$name/WORKFLOW.md"
+  [ -f "$dir/BACKLOG.md" ] && check_no_hardcoded_paths_or_credentials "$dir/BACKLOG.md" "$name/BACKLOG.md"
+  [ -f "$dir/FOLDER_STRUCTURE.md" ] && check_no_hardcoded_paths_or_credentials "$dir/FOLDER_STRUCTURE.md" "$name/FOLDER_STRUCTURE.md"
+
   if [ -d "$dir/agents" ]; then
     validate_agent_dir_entries "$dir/agents" "$name/agents"
   fi

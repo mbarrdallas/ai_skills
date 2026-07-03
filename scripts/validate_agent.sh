@@ -124,6 +124,8 @@ validate_one_agent() {
   if ! grep -q "^## Completion" "$file"; then
     warn "$file: no '## Completion' section - agent may not emit a status code convention"
   fi
+
+  check_no_hardcoded_paths_or_credentials "$file" "$file"
 }
 
 targets=()
