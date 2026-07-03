@@ -141,3 +141,55 @@ primary mode.
 **Related:** Immediately re-tested against the real
 `stats_dashboard_tui` instance after this correction - see the resulting
 audit report in `audits/` for what it actually found.
+
+## 2026-07-03: First real primary-mode run missed a bundled lesson and misjudged a root-cause fix
+
+**Issue:** Ran `workflow-monitor-agent` in primary mode against the real
+`stats_dashboard_tui` instance (first genuine test of the corrected
+design). Human spot-checking the resulting report found two real gaps:
+1. `lessons/2026-06-28-subagent-no-exit.md` actually bundles **two**
+   distinct lessons in one file (two `# Lesson` sections separated by a
+   `---` rule) - the audit evaluated only the first and never noticed the
+   second ("Extension Must Be Symlinked After Delivery"), whose action
+   item genuinely was never applied.
+2. The first lesson's claimed fix ("agent Completion-section wording") was
+   classified "Applied and verified" - but this is *precisely* the
+   canonical case named in this very agent's own instructions and
+   `WORKFLOW.md` as the example to watch for: a symptom-level fix
+   (instruction wording) that doesn't explain a structural/runtime symptom
+   (a process not exiting), while the true root cause
+   (`pi-agent-dashboard`'s un-`unref()`'d timers) was found independently
+   the same day, unrelated to wording at all. The agent didn't apply its
+   own stated verification bar rigorously enough - it accepted the
+   lesson's self-reported "Fix Applied" status without actually checking
+   whether the fix's *mechanism* plausibly explained the symptom, or
+   whether the same defect category had recurred since.
+
+**Learning:** Real-world testing (not just design review) surfaces gaps a
+design review can't - this is exactly the same lesson the earlier design
+review already taught (grilling a design catches some things, but nothing
+substitutes for running it against real, messy data). Two specific,
+generalizable failure modes found: (a) naive one-file-equals-one-lesson
+scanning misses content that doesn't fit the expected shape (same category
+as `knowledge-lint-agent`'s multi-line-wikilink pitfall - worth watching
+for this pattern anywhere a fixed-shape assumption is made over free-form
+content), and (b) accepting a source's own self-reported status
+("Fix Applied") without independently verifying it, which is exactly the
+kind of thing a *lint/audit* role exists to catch rather than rubber-stamp.
+
+**Improvement:** `AGENTS/workflow_monitor_agent.md`'s "core check" section
+rewritten: (1) explicit instruction to check every lessons file for
+multiple lesson sections before classifying anything, (2) a genuinely
+stronger verification bar - does the fix's *mechanism* plausibly explain
+the *mechanism* of the symptom, has the same defect category recurred or
+been independently fixed again later (strong evidence of misdiagnosis),
+is there actual positive evidence of non-recurrence - replacing what had
+become "does a plausible-sounding change exist somewhere". Explicitly
+stated: a lesson's own "Fix Applied" self-report is not authoritative.
+Corrected the `stats_dashboard_tui` audit report itself to add the missed
+lesson and fix the wrong classification, with a visible correction note
+rather than silently editing history. Filed the missed lesson's action
+item to `feature_development_workflow`'s `BACKLOG.md`.
+
+**Related:** `audits/2026-07-03_stats_dashboard_tui-instance.md` (see its
+correction note at the top); `WORKFLOWS/feature_development_workflow/BACKLOG.md`.

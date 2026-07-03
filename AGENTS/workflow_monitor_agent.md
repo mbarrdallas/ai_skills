@@ -75,7 +75,18 @@ manufacturing findings from nothing.
 
 ### The core check: were lessons actually applied upstream?
 
-For **every** file in `lessons/`:
+**Pitfall — a lessons file can bundle more than one lesson.** Don't assume
+one file equals one lesson. Check every file for multiple `# Lesson`/`#`
+top-level headings (often separated by a `---` rule) — a real observed
+case: a file titled around "agents must exit immediately" also contained a
+second, unrelated lesson ("extension must be symlinked after delivery")
+that got silently skipped by evaluating the file as a single unit. Split
+multi-lesson files into separate rows/entries in your report before
+classifying anything (mirrors `knowledge-lint-agent`'s multi-line-wikilink
+pitfall — same category of mistake: naive one-unit-per-file/line scanning
+misses content that doesn't fit the expected shape).
+
+For **every** lesson (after splitting multi-lesson files per above):
 1. Read it fully — what was the root cause, and what fix/action did it
    recommend?
 2. Check whether that fix actually exists today in the relevant shared
@@ -83,23 +94,45 @@ For **every** file in `lessons/`:
    `IMPROVEMENT_LOG.md`/`SELF_IMPROVEMENT_LOG.md` files), `WORKFLOWS/*/WORKFLOW.md`,
    or (if the lesson concerns a tool/extension rather than an agent
    definition) the relevant tool's own repo/commit history.
-3. Classify each lesson as one of:
-   - **Applied and verified** — the fix exists, and there's evidence
-     (a later successful run, a passing test) that it actually resolved
-     the root cause.
-   - **Applied but unverified** — a fix was made, but nothing confirms it
-     addressed the *actual* root cause rather than a plausible-looking
-     symptom. This is a real Jidoka gap: a fix without verification is a
-     defect risk, not a resolved issue. **Watch specifically for a fix
-     that treats a symptom (e.g. rewording instructions) when the true
-     root cause is structural/environmental (e.g. a process-level bug) —
-     these look resolved but aren't.**
+3. **Before accepting a claimed fix as genuinely resolving the root
+   cause, actively look for evidence it's actually correct — don't just
+   accept a lesson's own "Fix Applied" self-report, and don't just check
+   whether *some* textually-plausible change exists.** Specifically:
+   - Does the *mechanism* of the claimed fix plausibly explain the
+     *mechanism* of the observed symptom? (e.g. "agents kept running after
+     printing status" being attributed to *instruction wording* is a claim
+     worth scrutinizing — wording alone doesn't explain a process failing
+     to exit at the OS/runtime level; that smells like an environmental/
+     structural cause being misdiagnosed as a behavioral one.)
+   - Has the *same category* of defect been independently reported,
+     investigated, or fixed again *after* this lesson claimed it was
+     resolved? If so, the original "fix" almost certainly didn't address
+     the true root cause, no matter how plausible it looked — check
+     recent `SELF_IMPROVEMENT_LOG.md`/`IMPROVEMENT_LOG.md` entries and
+     related tool repos' commit history for a *later*, *different* fix to
+     what sounds like the same underlying problem.
+   - Is there an actual test, reproduction, or later successful run that
+     demonstrates the symptom stopped occurring — or only a plausible-
+     sounding textual change with no verification step at all?
+4. Classify each lesson as one of:
+   - **Applied and verified** — the fix exists, its mechanism plausibly
+     explains the symptom, and there's positive evidence (a later
+     successful run, a passing test, absence of recurrence) it actually
+     resolved the root cause.
+   - **Applied but wrong root cause / unverified** — a fix was made, but
+     either its mechanism doesn't plausibly explain the symptom, or the
+     same category of defect recurred/was independently fixed again later
+     (strong evidence the original diagnosis was wrong), or nothing at all
+     confirms it addressed the *actual* root cause. This is a real Jidoka
+     gap: a fix without genuine verification is a defect risk, not a
+     resolved issue, **even if the lesson itself claims "Fix Applied"** —
+     the lesson's own self-assessment is not authoritative.
    - **Not applied** — the recommended action was never actually made. A
      clear, actionable finding: file it to the *shared definition's*
      `BACKLOG.md`/`SELF_IMPROVEMENT_LOG.md` context (not this run's own
      directory, which is just a historical record) so it gets fixed once,
      not rediscovered again by a future run.
-4. Cross-check lessons against each other — do two lessons describe the
+5. Cross-check lessons against each other — do two lessons describe the
    same underlying incident (e.g. "same root cause, earlier observation"
    cross-references)? If so, treat them as one incident for classification
    purposes, and note whether the *later* lesson's fix (if any) actually
