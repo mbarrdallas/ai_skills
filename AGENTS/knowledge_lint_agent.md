@@ -51,8 +51,10 @@ that back to `knowledge-ingest-agent` (or the human) to action.
 
 ## Your Outputs
 
-A findings report covering, per the `wiki-maintenance` skill's Lint
-operation:
+A findings report structured per
+`WORKFLOWS/llm_wiki_workflow/templates/LINT_REPORT_TEMPLATE.md` (relative
+to the `ai_skills` repo root), covering the following per the
+`wiki-maintenance` skill's Lint operation:
 - Contradictions between pages.
 - Stale claims superseded by a newer source but not yet updated.
 - Orphan pages — check **content-to-content** links (concept/source pages

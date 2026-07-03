@@ -13,10 +13,13 @@ The workflow definition lives in:
 │   └── knowledge_lint_agent.md → ../../../AGENTS/knowledge_lint_agent.md
 │       (deliberately separate from the ingest agent - see WORKFLOW.md's
 │        "Why two agents, not one")
-├── templates/                      # Starter page templates for consuming repos
+├── templates/                      # Starter page/report templates for consuming repos
 │   ├── SOURCE_PAGE_TEMPLATE.md
 │   ├── CONCEPT_PAGE_TEMPLATE.md
-│   └── AGENTS_MD_TEMPLATE.md
+│   ├── AGENTS_MD_TEMPLATE.md
+│   ├── BACKLOG_TEMPLATE.md
+│   └── LINT_REPORT_TEMPLATE.md      # Standard structure for knowledge-lint-agent's
+│                                    #   findings reports
 └── PRIVATE/
     └── SKILLS/
         └── wiki-maintenance/

@@ -170,8 +170,15 @@ Run periodically (when asked, or when a domain has grown noticeably):
    exist yet) rather than just mentioning it in the findings report and
    letting it evaporate. Don't guess or invent new content yourself to
    resolve it.
-5. Append a `lint` entry to the log summarizing findings, fixes, and which
-   backlog items were added.
+5. Write up findings using
+   `WORKFLOWS/llm_wiki_workflow/templates/LINT_REPORT_TEMPLATE.md` as the
+   structure — keeps output consistent across passes and repos, and its
+   sections map directly to the categories in step 3. Skip subsections
+   with no findings rather than padding the report with "none found" for
+   every category.
+6. Append a `lint` entry to the log summarizing findings, fixes, and which
+   backlog items were added (same one-line summary as the report's Summary
+   section).
 
 **BACKLOG.md conventions** (repo root, one per consuming repo — separate
 from `WORKFLOWS/llm_wiki_workflow/BACKLOG.md`, which tracks future work on
