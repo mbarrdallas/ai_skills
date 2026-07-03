@@ -162,6 +162,69 @@ When designing a new workflow:
 4. Cross-reference the two agents' definitions to each other ("why this is
    separate") so future edits don't accidentally re-merge them.
 
+## Where running workflow session artifacts go
+
+**Applies to async, multi-agent-orchestrated workflows** (e.g.
+`feature_development_workflow`) that produce planning/process artifacts
+distinct from the code/content they're producing — requirements docs,
+design docs, task plans, orchestrator state, review reports, etc.
+
+**Rule: these artifacts go under `~/WORKSPACE/active_workflows/<workflow_name>/`,
+never inside the code repository itself.** Only the actual code (written via
+git worktrees) and actual content (e.g. wiki pages) belong in the
+target repo.
+
+```
+~/WORKSPACE/active_workflows/<workflow_name>/
+├── LOCATIONS.md          # paths to code repo, skills, agents, worktrees -
+│                         #   agents resolve paths through this file, never
+│                         #   hardcode them (see "No hardcoded paths" below)
+├── WORKFLOW_CONFIG.md
+├── REQUIREMENTS.md
+├── design/ planning/ orchestrator/ reviews/ docs/ lessons/
+```
+
+Worktrees for parallel task execution live separately, at
+`{worktrees_dir}/{workflow_name}/task-<id>-<name>/` (path configured in
+that workflow run's `LOCATIONS.md`) — removed after a successful merge.
+The `active_workflows/<workflow_name>/` directory itself is kept after
+completion for reference (archive periodically if it builds up).
+
+If a workflow-planning artifact (`IMPLEMENTATION_SPEC*.md`,
+`TEST_COVERAGE*.md`, `ORCHESTRATOR_STATE.md`, `TASK_PLAN.md`, or similar)
+ever ends up inside a code repo, that's a bug — move it to
+`active_workflows/` and `.gitignore` the pattern if it recurs (see
+`git-workflow` skill).
+
+**Does not apply** to inline, human-in-the-loop workflows with no
+orchestrator/worktree machinery (e.g. `llm_wiki_workflow`) — those don't
+spin up a session-artifact directory at all; their only "artifacts" are
+the actual content they produce (wiki pages, `log.md`, `BACKLOG.md`),
+written directly into the consuming repo.
+
+See `WORKFLOWS/feature_development_workflow/FOLDER_STRUCTURE.md` and
+`LOCATIONS_TEMPLATE.md` for the full reference layout and path-resolution
+conventions.
+
+### Tier-0 orchestrators must load this skill
+
+**Rule: any Tier-0 orchestrator agent (the top-level coordinator of a
+workflow - e.g. `feature-development-orchestrator`) must include
+`workflow-conventions` in its own `skills:` frontmatter field and actually
+load/apply it**, not just the workflow-specific skills it already uses
+(`git-workflow`, `task-breakdown`, etc.). The orchestrator is the agent
+responsible for creating the workflow's own planning/process artifacts
+(state files, logs, budget tracking, task plans) - it needs this skill's
+"Where running workflow session artifacts go" rule directly, not
+second-hand, since getting artifact placement wrong is exactly the kind of
+mistake that only surfaces once code/content and process files are already
+tangled together in the wrong repo.
+
+This applies regardless of whether the orchestrator is a public `AGENTS/`
+agent or a workflow-`PRIVATE/AGENTS/` one (most orchestrators are private,
+since they're tightly coupled to one workflow's specific shape - see
+"Public vs. workflow-private" above).
+
 ## No hardcoded paths or credentials
 
 Applies to **workflows, agents, and skills alike**: definitions in this repo
@@ -213,3 +276,6 @@ details on what each validator checks.
 - `WORKFLOWS/feature_development_workflow/` and
   `WORKFLOWS/llm_wiki_workflow/` — two working examples at different scales
   (async multi-agent orchestration vs. inline single-agent).
+- `WORKFLOWS/feature_development_workflow/FOLDER_STRUCTURE.md` and
+  `LOCATIONS_TEMPLATE.md` — full detail on `active_workflows/` layout and
+  path resolution (see "Where running workflow session artifacts go" above).
