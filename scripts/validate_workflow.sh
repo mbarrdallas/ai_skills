@@ -48,6 +48,29 @@ validate_agent_dir_entries() {
   done < <(find "$dir" -maxdepth 1 -type f -o -type l 2>/dev/null | grep '\.md$' | sort)
 }
 
+validate_skill_dir_entries() {
+  # $1 = directory containing skill subdirectories (e.g. PRIVATE/SKILLS/)
+  local dir="$1" label="$2"
+  local d
+  while IFS= read -r d; do
+    [ -z "$d" ] && continue
+    "$SCRIPT_DIR/validate_skill.sh" "$d" > /tmp/validate_skill_out.$$ 2>&1
+    local rc=$?
+    grep -Ev '^Summary$|^Pass: [0-9]+ +Warn: [0-9]+ +Fail: [0-9]+$' /tmp/validate_skill_out.$$ | sed '/^Skill: /d'
+    local sub_pass sub_warn sub_fail
+    sub_pass=$(grep -c '^PASS' /tmp/validate_skill_out.$$)
+    sub_warn=$(grep -c '^WARN' /tmp/validate_skill_out.$$)
+    sub_fail=$(grep -c '^FAIL' /tmp/validate_skill_out.$$)
+    PASS_COUNT=$((PASS_COUNT+sub_pass))
+    WARN_COUNT=$((WARN_COUNT+sub_warn))
+    FAIL_COUNT=$((FAIL_COUNT+sub_fail))
+    rm -f /tmp/validate_skill_out.$$
+    if [ "$rc" -ne 0 ] && [ "$sub_fail" -eq 0 ]; then
+      fail "$label: $d failed validate_skill.sh (exit $rc)"
+    fi
+  done < <(find "$dir" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | sort)
+}
+
 validate_one_workflow() {
   local dir="$1"
   dir="${dir%/}"
@@ -93,6 +116,10 @@ validate_one_workflow() {
 
   if [ ! -d "$dir/agents" ] && [ ! -d "$dir/PRIVATE/AGENTS" ]; then
     warn "$name: no agents/ or PRIVATE/AGENTS/ directory found - workflow has no linked agent definitions"
+  fi
+
+  if [ -d "$dir/PRIVATE/SKILLS" ]; then
+    validate_skill_dir_entries "$dir/PRIVATE/SKILLS" "$name/PRIVATE/SKILLS"
   fi
 }
 

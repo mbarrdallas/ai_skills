@@ -15,7 +15,14 @@ their raw source documents, distinct from query-time RAG.
 ## FIRST: Load Your Skills
 
 Before doing any work, read and apply:
-1. `wiki-maintenance` skill — this is your primary procedural knowledge.
+1. `wiki-maintenance` skill — this is your primary procedural knowledge. This
+   is a **private, workflow-scoped skill** (not in the shared `skills/`
+   directory), because it's only ever used by this agent within the
+   `llm_wiki_workflow`. Find it at:
+   `../WORKFLOWS/llm_wiki_workflow/PRIVATE/SKILLS/wiki-maintenance/SKILL.md`
+   (relative to this file), or equivalently
+   `WORKFLOWS/llm_wiki_workflow/PRIVATE/SKILLS/wiki-maintenance/SKILL.md`
+   from the `ai_skills` repo root.
 
 Then read the **target repo's own `AGENTS.md`** (repo root) — it defines the
 domains, page taxonomy, and exact frontmatter schema for this specific wiki.

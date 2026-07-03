@@ -79,7 +79,16 @@ See `agents/knowledge_ingest_agent.md` (symlink to
 
 | Skill | Used By | Purpose |
 |-------|---------|---------|
-| wiki-maintenance | Knowledge Ingest Agent | Domain-agnostic ingest/query/lint procedure, frontmatter/index/log conventions |
+| wiki-maintenance (private, `PRIVATE/SKILLS/wiki-maintenance/`) | Knowledge Ingest Agent | Domain-agnostic ingest/query/lint procedure, frontmatter/index/log conventions |
+
+`wiki-maintenance` is a **workflow-private skill** (see
+`PRIVATE/SKILLS/wiki-maintenance/SKILL.md`), not in the shared `skills/`
+directory — it's only ever used by the Knowledge Ingest Agent within this
+workflow, so it doesn't need (or want) global auto-triggering across
+unrelated pi sessions. To make the *workflow itself* publicly discoverable
+despite its mechanics being private, see the public `trigger-llm-wiki-workflow`
+skill (in the shared `skills/` directory), which recognizes the "build me a
+second brain" pattern and routes here.
 
 ## Repo Requirements
 

@@ -18,12 +18,15 @@ source "$SCRIPT_DIR/_lib.sh"
 ROOT="$(repo_root)"
 REQUIRED_FIELDS=(name description tools skills spawns model)
 
-# skill_exists <skill-name>: true if skills/<name>/SKILL.md exists, or a
-# root-level symlink/dir <name>/SKILL.md exists (e.g. skill-creator, grill-me).
+# skill_exists <skill-name>: true if skills/<name>/SKILL.md exists, a
+# root-level symlink/dir <name>/SKILL.md exists (e.g. skill-creator,
+# grill-me), or a workflow-private WORKFLOWS/*/PRIVATE/SKILLS/<name>/SKILL.md
+# exists (workflow-scoped skills used by only one workflow's agent(s)).
 skill_exists() {
   local name="$1"
   [ -f "$ROOT/skills/$name/SKILL.md" ] && return 0
   [ -f "$ROOT/$name/SKILL.md" ] && return 0
+  find "$ROOT/WORKFLOWS" -type f -path "*/PRIVATE/SKILLS/$name/SKILL.md" 2>/dev/null | grep -q . && return 0
   return 1
 }
 

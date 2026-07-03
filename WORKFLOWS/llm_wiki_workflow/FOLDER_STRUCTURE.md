@@ -10,18 +10,35 @@ The workflow definition lives in:
 ├── FOLDER_STRUCTURE.md             # This file
 ├── agents/                         # Symlinks to agents used by this workflow
 │   └── knowledge_ingest_agent.md → ../../../AGENTS/knowledge_ingest_agent.md
-└── templates/                      # Starter page templates for consuming repos
-    ├── SOURCE_PAGE_TEMPLATE.md
-    ├── CONCEPT_PAGE_TEMPLATE.md
-    └── AGENTS_MD_TEMPLATE.md
+├── templates/                      # Starter page templates for consuming repos
+│   ├── SOURCE_PAGE_TEMPLATE.md
+│   ├── CONCEPT_PAGE_TEMPLATE.md
+│   └── AGENTS_MD_TEMPLATE.md
+└── PRIVATE/
+    └── SKILLS/
+        └── wiki-maintenance/
+            └── SKILL.md             # Workflow-private skill: domain-agnostic
+                                     #   ingest/query/lint procedure. Only
+                                     #   used by knowledge_ingest_agent within
+                                     #   this workflow, so it's intentionally
+                                     #   NOT in the shared skills/ directory
+                                     #   (no global auto-trigger).
 ```
 
 Unlike `feature_development_workflow`, this workflow has no orchestrator, no
 parallel task execution, and no worktrees — it runs inline in a single
 conversation with a human in the loop. There is deliberately no
-`CONFIG_TEMPLATE.md` / `LOCATIONS_TEMPLATE.md` / `PRIVATE/` — those exist in
+`CONFIG_TEMPLATE.md` / `LOCATIONS_TEMPLATE.md` — those exist in
 `feature_development_workflow` to support async, multi-agent orchestration
-that this workflow doesn't need.
+that this workflow doesn't need. `PRIVATE/SKILLS/` (unlike
+`feature_development_workflow`, which only uses `PRIVATE/AGENTS/`) mirrors
+the existing `PRIVATE/AGENTS/` pattern for a skill that's tightly coupled to
+one workflow's single agent rather than being generally reusable.
+
+Global discoverability of the workflow itself (despite its mechanics being
+private) comes from the public `skills/trigger-llm-wiki-workflow/` skill,
+which recognizes the "second brain" / "LLM wiki" pattern in conversation and
+points to this workflow.
 
 ## Consuming Repo Structure
 

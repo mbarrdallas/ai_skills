@@ -1,0 +1,155 @@
+---
+name: workflow-conventions
+description: Structural conventions for defining workflows, agents, and skills in the ai_skills repo (required/recommended files, YAML frontmatter fields, naming conventions, public vs. workflow-private scoping, symlink patterns) and how to validate them with scripts/validate_skill.sh, validate_agent.sh, validate_workflow.sh, and validate_all.sh. Use when creating a new workflow, agent, or skill in ai_skills, when asking "how should I structure this workflow", "what fields does an agent need", "should this be public or private", or before committing new WORKFLOWS/*, AGENTS/*, or skills/* content.
+---
+
+# Workflow Conventions
+
+The structural standard this repo's content is expected to follow, and the
+tooling (`scripts/validate_*.sh`) that checks it. This is the repo's own
+meta-documentation — read it before creating or restructuring a workflow,
+agent, or skill. For *designing an individual agent's role/behavior*, see
+the `agent-creator` skill instead; this skill covers the repo-wide
+structural/file-layout standard, including how workflows tie agents and
+skills together.
+
+## Skill format
+
+```
+skills/<skill-name>/SKILL.md
+```
+
+Required YAML frontmatter:
+```yaml
+---
+name: <kebab-case, matches directory name exactly>
+description: >
+  What the skill does, when to use it, and trigger phrases. Should read
+  naturally to an LLM deciding whether to load it — mention "use when" /
+  concrete trigger phrases so auto-triggering works well.
+---
+```
+Followed by the skill's actual content (procedures, checklists, reference
+material). No other frontmatter fields are used for skills.
+
+**Checked by:** `scripts/validate_skill.sh` — fails if `SKILL.md` is
+missing or frontmatter lacks `name`/`description`; warns if `name` doesn't
+match the directory, description is short (<40 chars) or doesn't mention
+"use when"/"trigger", or body content looks empty.
+
+## Agent format
+
+```
+AGENTS/<agent_name_snake_case>.md
+```
+
+Required YAML frontmatter:
+```yaml
+---
+name: <kebab-case>
+description: <what this agent does, one or two sentences>
+tools: <comma-separated tool list, e.g. read, write, bash, grep, find, ls, edit>
+skills: <comma-separated skill names this agent loads, or "none">
+spawns: <comma-separated agent names this agent can invoke, or "none">
+model: <claude-sonnet-4-5 | claude-opus-4-5-... | etc.>
+---
+```
+Body should include a `## Completion` section documenting the agent's status
+code convention (`DONE`, `BLOCKED needs: ...`, etc.) as the mandatory final
+output line.
+
+**Naming:** the file's snake_case name should match the frontmatter `name`'s
+kebab-case (e.g. `name: context-agent` ↔ `context_agent.md`).
+
+**Checked by:** `scripts/validate_agent.sh` — fails if any required
+frontmatter field is missing; warns on naming mismatches, unresolved
+`skills:`/`spawns:` references (unresolved spawns may be intentionally
+aspirational, e.g. a not-yet-built agent), non-`claude-*` model ids, or a
+missing `## Completion` section.
+
+## Workflow format
+
+```
+WORKFLOWS/<workflow_name>/
+├── WORKFLOW.md              # required: overview, diagram, agents/skills
+│                             #   table, operations, getting-started
+├── BACKLOG.md                # recommended: future work for this workflow
+├── FOLDER_STRUCTURE.md        # recommended: this workflow's + consuming
+│                             #   repos' folder layout
+├── agents/                   # symlinks to shared agents this workflow uses
+│   └── <agent>.md → ../../../AGENTS/<agent>.md
+├── templates/                 # (optional) starter file templates
+└── PRIVATE/                   # (optional) workflow-scoped, not shared
+    ├── AGENTS/
+    │   └── <agent>.md         # agent definitions too coupled to this
+    │                          #   workflow's specific shape to be reusable
+    │                          #   elsewhere (e.g. an orchestrator managing
+    │                          #   this workflow's specific pipeline)
+    └── SKILLS/
+        └── <skill-name>/
+            └── SKILL.md       # skills only ever used by this workflow's
+                                #   agent(s); intentionally excluded from
+                                #   global auto-triggering
+```
+
+**Checked by:** `scripts/validate_workflow.sh` — fails if `WORKFLOW.md` is
+missing; warns if `BACKLOG.md`/`FOLDER_STRUCTURE.md` are missing or no
+`agents/`/`PRIVATE/AGENTS/` exists. Recurses into `agents/`,
+`PRIVATE/AGENTS/`, and `PRIVATE/SKILLS/` entries and validates each against
+the agent/skill standard above (broken symlinks are a hard fail).
+
+## Public (`skills/`) vs. workflow-private (`PRIVATE/SKILLS/`)
+
+The test: **would this skill's content and auto-trigger conditions make
+sense to load in a completely unrelated pi session, outside this specific
+workflow?**
+
+- **Yes → public**, under `skills/`. Example: `codebase-analysis` is useful
+  any time an agent needs to understand an unfamiliar codebase, regardless
+  of which workflow (if any) is running.
+- **No, only meaningful in the context of one specific workflow's
+  agent(s) → private**, under `WORKFLOWS/<workflow>/PRIVATE/SKILLS/`.
+  Example: `wiki-maintenance` (ingest/query/lint mechanics for the
+  `llm_wiki_workflow`) is only ever invoked by that workflow's
+  `knowledge-ingest-agent` — its trigger phrases ("ingest a source", "lint
+  the wiki") only make sense once a repo is already set up with the
+  `raw/`+`wiki/`+`AGENTS.md` layout that workflow expects.
+
+Making a skill private loses global auto-triggering (it won't get
+symlinked into `~/.pi/agent/skills` or matched by description in unrelated
+sessions). If you still want the *workflow itself* to be publicly
+discoverable despite hiding its mechanics, add a thin public **routing
+skill** whose only job is pattern recognition + pointing at the workflow —
+see `trigger-llm-wiki-workflow` as the reference example for
+`llm_wiki_workflow`.
+
+The same reasoning applies to agents and `PRIVATE/AGENTS/` — e.g. an
+orchestrator tightly coupled to one workflow's parallel-task/worktree shape
+belongs in `PRIVATE/AGENTS/`, not `AGENTS/`.
+
+## Validating before committing
+
+Always run the validators before committing new/changed skills, agents, or
+workflows:
+
+```bash
+scripts/validate_all.sh                       # everything
+scripts/validate_skill.sh [skill-dir]         # one skill, or all skills/*
+scripts/validate_agent.sh [agent-file.md]     # one agent, or all AGENTS/*
+scripts/validate_workflow.sh [workflow-dir]   # one workflow, or all WORKFLOWS/*
+```
+
+Exit code is `1` if any `FAIL` was found, `0` otherwise (warnings never
+fail the run — they surface convention drift like naming mismatches or
+thin descriptions without blocking work). See `scripts/README.md` for full
+details on what each validator checks.
+
+## See also
+
+- `agent-creator` skill — designing an individual agent's role, inputs,
+  outputs, and behavior (complements this skill's structural/file-layout
+  focus).
+- `scripts/README.md` — validator usage and internals.
+- `WORKFLOWS/feature_development_workflow/` and
+  `WORKFLOWS/llm_wiki_workflow/` — two working examples at different scales
+  (async multi-agent orchestration vs. inline single-agent).
