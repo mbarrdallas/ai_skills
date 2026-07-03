@@ -1,0 +1,1 @@
+../../../AGENTS/knowledge_lint_agent.md

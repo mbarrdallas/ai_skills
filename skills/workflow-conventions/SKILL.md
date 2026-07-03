@@ -127,6 +127,41 @@ The same reasoning applies to agents and `PRIVATE/AGENTS/` — e.g. an
 orchestrator tightly coupled to one workflow's parallel-task/worktree shape
 belongs in `PRIVATE/AGENTS/`, not `AGENTS/`.
 
+## Separate the main workflow agent(s) from the validator/linter agent
+
+**Rule: a workflow's validation/health-check/review role must always be a
+separate agent from the agent(s) doing the primary work — never the same
+agent grading its own output.**
+
+An agent that just wrote or implemented something shares the blind spots
+that produced any issues in it — it's prone to missing the same
+contradictions, gaps, or mistakes on a self-review pass that it missed while
+producing the work. A separate agent, coming to the artifact fresh with
+validation as its *only* job, catches more.
+
+This applies regardless of workflow shape or scale:
+
+- **`feature_development_workflow`** (async, multi-agent): `coder-agent`
+  implements; `reviewer-agent` — a distinct agent — validates the code
+  against requirements/conventions/quality before it ships.
+- **`llm_wiki_workflow`** (inline, human-in-the-loop): `knowledge-ingest-agent`
+  ingests sources and answers queries; `knowledge-lint-agent` — a distinct
+  agent — health-checks the wiki (contradictions, orphans, stale claims,
+  missing cross-refs). Even though both agents are lightweight and run in
+  the same kind of inline conversation, they are still separate role
+  definitions with separate, narrower scopes.
+
+When designing a new workflow:
+1. Identify the primary-work agent(s) (implementers, writers, ingesters).
+2. Identify the validation/lint/review responsibility explicitly as its own
+   role, even if the workflow is small enough that one human runs both
+   agents back-to-back in the same session.
+3. Give the validator agent a narrow, explicit "not your job" list covering
+   the primary-work agent's responsibilities (and vice versa), so scope
+   doesn't quietly blur back together over time.
+4. Cross-reference the two agents' definitions to each other ("why this is
+   separate") so future edits don't accidentally re-merge them.
+
 ## No hardcoded paths or credentials
 
 Applies to **workflows, agents, and skills alike**: definitions in this repo

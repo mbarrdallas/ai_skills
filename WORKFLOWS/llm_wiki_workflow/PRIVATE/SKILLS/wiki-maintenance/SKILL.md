@@ -92,6 +92,8 @@ tooling or depending on PDF/docx libraries being installed.
 
 ## Operation: Ingest
 
+**Performed by `knowledge-ingest-agent`.**
+
 1. A new file lands in `raw/<domain>/` (or is fetched/pasted in by the
    agent at the human's direction).
 2. Read it fully. **Discuss key takeaways with the human before writing
@@ -116,6 +118,8 @@ A single source touching 10-15 wiki pages is expected, not excessive.
 
 ## Operation: Query
 
+**Performed by `knowledge-ingest-agent`.**
+
 1. Read the relevant domain index(es) first to find candidate pages.
 2. Drill into the specific pages found; read them fully before answering.
 3. Synthesize an answer with citations back to wiki pages (and raw sources
@@ -128,22 +132,62 @@ A single source touching 10-15 wiki pages is expected, not excessive.
 
 ## Operation: Lint
 
+**Performed by `knowledge-lint-agent`, not `knowledge-ingest-agent`.** These
+are deliberately separate roles (mirroring the `coder-agent`/`reviewer-agent`
+split in `feature_development_workflow`) so the wiki's health isn't
+self-graded by the same agent that wrote the pages. If you're
+`knowledge-ingest-agent`, don't perform this operation yourself — hand off
+to `knowledge-lint-agent`.
+
 Run periodically (when asked, or when a domain has grown noticeably):
 
 1. Enumerate all wiki pages and all `[[wikilink]]`-style cross-references
    between them.
-2. Check for:
+   **Pitfall:** `[[wikilink]]` display text sometimes wraps across multiple
+   lines in prose (for line-length reasons). A naive line-by-line scan for
+   `\[\[...\]\]` will miss these and produce false orphan/one-directional-
+   link findings. Join wrapped lines (or use a parser that handles this)
+   before computing the link graph, or you'll report false positives.
+2. Build a **content-to-content** link graph (concept/source/entity/
+   synthesis pages linking to each other) separately from the fact that a
+   domain index links to everything. Being listed in an index is necessary
+   but not sufficient — the meaningful orphan check is whether a page has
+   any inbound link from *another content page*, not just from the index.
+3. Check for:
    - **Contradictions** between pages (same fact stated differently).
    - **Stale claims** superseded by a newer source but not yet updated.
-   - **Orphan pages** — no inbound links from any other page.
+   - **Orphan pages** — no inbound links from any other *content* page.
    - **One-directional links** — page A links to B, but B doesn't link back
      where a reciprocal link would help navigation (not always required,
      but worth checking for closely related concept pages).
    - **Important concepts mentioned but lacking their own page.**
    - **Data gaps** that a web search or a new source could fill.
-3. Fix what's safe to fix directly (e.g. adding a missing reciprocal link).
-   Flag the rest to the human rather than guessing.
-4. Append a `lint` entry to the log summarizing findings and fixes.
+4. Fix what's safe to fix directly (e.g. adding a missing reciprocal link).
+   For everything else — anything that needs a human decision, new content,
+   or a follow-up source — **file it as a checkbox item in the repo's root
+   `BACKLOG.md`** (create it from
+   `WORKFLOWS/llm_wiki_workflow/templates/BACKLOG_TEMPLATE.md` if it doesn't
+   exist yet) rather than just mentioning it in the findings report and
+   letting it evaporate. Don't guess or invent new content yourself to
+   resolve it.
+5. Append a `lint` entry to the log summarizing findings, fixes, and which
+   backlog items were added.
+
+**BACKLOG.md conventions** (repo root, one per consuming repo — separate
+from `WORKFLOWS/llm_wiki_workflow/BACKLOG.md`, which tracks future work on
+the *shared workflow itself*, not wiki content):
+- Checkbox list: `- [ ] <item>` (open) / `- [x] <item>` (done).
+- Group by domain if the list grows long.
+- Each item should be concrete enough to action later without re-deriving
+  context (cite the page/source it came from).
+- `knowledge-ingest-agent` should glance at open items relevant to whatever
+  it's currently touching during an ingest, and **complete them opportunistically
+  when convenient** (check them off, don't force a special session) — not
+  required to clear the whole backlog, just don't ignore an obviously-relevant
+  open item while already in that part of the wiki.
+- `knowledge-lint-agent` should also glance at existing open items during a
+  lint pass and check off anything that's since been resolved (e.g. by an
+  ingest that happened to address it), even if it wasn't the one who did it.
 
 ## Git workflow
 

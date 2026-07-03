@@ -9,7 +9,10 @@ The workflow definition lives in:
 ├── BACKLOG.md                      # Workflow-specific future work
 ├── FOLDER_STRUCTURE.md             # This file
 ├── agents/                         # Symlinks to agents used by this workflow
-│   └── knowledge_ingest_agent.md → ../../../AGENTS/knowledge_ingest_agent.md
+│   ├── knowledge_ingest_agent.md → ../../../AGENTS/knowledge_ingest_agent.md
+│   └── knowledge_lint_agent.md → ../../../AGENTS/knowledge_lint_agent.md
+│       (deliberately separate from the ingest agent - see WORKFLOW.md's
+│        "Why two agents, not one")
 ├── templates/                      # Starter page templates for consuming repos
 │   ├── SOURCE_PAGE_TEMPLATE.md
 │   ├── CONCEPT_PAGE_TEMPLATE.md
@@ -50,6 +53,12 @@ A repo using this workflow (e.g. `mariamas_brain`) is structured as:
 │                                    #   taxonomy, frontmatter fields).
 │                                    #   References this workflow as the
 │                                    #   kickoff point for ingest/query/lint.
+├── BACKLOG.md                      # Wiki-content backlog for THIS repo -
+│                                    #   lint findings that need a human
+│                                    #   decision/new content, checked off
+│                                    #   opportunistically. Separate from
+│                                    #   WORKFLOWS/llm_wiki_workflow/BACKLOG.md
+│                                    #   (shared-workflow future work).
 ├── EXTERNALS/
 │   └── ai_skills/                  # git submodule -> ai_skills repo
 ├── WORKFLOWS/

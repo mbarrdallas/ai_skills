@@ -1,0 +1,8 @@
+# Obsidian vault state - this repo is a code repo, not an Obsidian vault.
+# If a .obsidian/ directory appears here, it's accidental (e.g. from
+# navigating through a symlinked workflow dir in an Obsidian window) - never
+# commit it.
+.obsidian/
+
+# OS cruft
+.DS_Store

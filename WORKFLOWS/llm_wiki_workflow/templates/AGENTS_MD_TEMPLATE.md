@@ -36,6 +36,9 @@ Standard fields: `title`, `domain`, `type`, `created`, `updated`, `tags`,
 - `wiki/index.md` — root catalog linking to each domain index.
 - `wiki/<domain>/index.md` — per-domain catalog.
 - `wiki/log.md` — shared, chronological, append-only log across all domains.
+- `BACKLOG.md` (repo root) — wiki-content backlog: lint findings that need a
+  human decision or new content, filed as checkbox items and completed
+  opportunistically. See `WORKFLOWS/llm_wiki_workflow/templates/BACKLOG_TEMPLATE.md`.
 
 ## Git workflow
 
