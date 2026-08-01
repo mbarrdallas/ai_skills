@@ -208,6 +208,7 @@ Human Goal Statement
 | doc-creator | Documentation | Generate docs |
 | lesson-capture | All (via Orchestrator) | Learn from mistakes |
 | agent-creator | Meta (workflow design) | Define agents |
+| trigger-feature-development-workflow | Routing (pre-Phase 1) | Recognize that a request warrants this workflow and set up the run instance |
 
 ## File Structure
 
@@ -222,6 +223,13 @@ See `CONFIG_TEMPLATE.md` for workflow configuration options.
 See `LOCATIONS_TEMPLATE.md` for path configuration.
 
 ## Getting Started
+
+The public `trigger-feature-development-workflow` skill routes conversational
+requests ("build me X", "kick off feature development") into this workflow,
+gathers the four inputs below, and creates the run instance under
+`~/WORKSPACE/active_workflows/<workflow-name>/` before handing off to the
+orchestrator. It also documents when *not* to use this workflow — trivial
+edits, debugging, and code questions shouldn't be routed through 8 phases.
 
 1. **State your goal:** Tell the agent what you want to build
 2. **Specify project type:** Greenfield or existing codebase

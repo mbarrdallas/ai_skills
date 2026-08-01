@@ -28,3 +28,14 @@ work) — this file is specifically about the research workflow itself.
   that diffs `~/WORKSPACE/AGENTS.md`'s "Known LLM Wikis" table against each
   listed wiki's actual `AGENTS.md` domain list and flags drift) - the fix
   above is a per-invocation behavioral safeguard, not a proactive check.
+- [ ] Consider a public `trigger-research-workflow` routing skill. This
+  workflow currently has no trigger skill, so "research X" / "find out about
+  X" / "look into X" don't auto-route to it the way
+  `trigger-llm-wiki-workflow` and `trigger-workflow-monitor` route to their
+  workflows. Note `research-agent` already carries
+  `trigger-llm-wiki-workflow`, but that routes findings *into* a wiki - a
+  different concern from routing an incoming request *into* research. If
+  added, follow `trigger-feature-development-workflow`'s pattern of
+  documenting explicit *non*-triggers (a quick factual lookup shouldn't
+  spin up a scoped research effort). (found via: adding
+  `trigger-feature-development-workflow`, 2026-08-01)
