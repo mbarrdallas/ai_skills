@@ -23,7 +23,12 @@
 #                       Never implied. Downloaded temp files are always removed
 #                       regardless of this flag.
 #   --force             Write the output even if quality heuristics flag the
-#                       conversion as suspect (e.g. image-only/scanned PDF).
+#                       conversion as suspect (e.g. image-only/scanned PDF, or
+#                       HTML that markitdown passed through unconverted).
+#
+# NOTE: for HTML input, prefer the dedicated `convert_html.sh` in this same
+# directory. markitdown is unreliable on real-world HTML; this script now
+# detects and refuses raw-HTML passthrough rather than letting it reach raw/.
 #
 # Exit codes: 0 ok, 1 usage/precondition error, 2 conversion failed,
 #             3 conversion suspect (refused without --force)
@@ -34,7 +39,9 @@ C_RED=$'\033[31m'; C_GREEN=$'\033[32m'; C_YELLOW=$'\033[33m'
 C_BOLD=$'\033[1m'; C_RESET=$'\033[0m'
 info() { printf "%s\n" "$1"; }
 ok()   { printf "${C_GREEN}OK${C_RESET}    %s\n" "$1"; }
-warn() { printf "${C_YELLOW}WARN${C_RESET}  %s\n" "$1"; }
+# Warnings explain refusals, so they belong on stderr alongside err() - not on
+# stdout, where they get lost whenever a caller pipes stdout elsewhere.
+warn() { printf "${C_YELLOW}WARN${C_RESET}  %s\n" "$1" >&2; }
 err()  { printf "${C_RED}ERROR${C_RESET} %s\n" "$1" >&2; }
 
 usage() {
@@ -144,11 +151,34 @@ if [ -n "$PAGES" ] && [ "$PAGES" -gt 0 ] 2>/dev/null; then
   fi
 fi
 
+# Catch a SECOND real failure mode: markitdown silently passing HTML through
+# unconverted. Observed on webapps.dol.gov, whose markup opens with a bogus
+# `<!--doctype html-->` comment before the real DOCTYPE; markitdown emitted the
+# page's raw HTML (scripts, stylesheets and all) and every text-volume
+# heuristic above happily passed it, so a raw/ file full of <script> blocks
+# entered the wiki unnoticed.
+HTML_HITS="$(grep -c -oE '<(html|body|div|span|script|style|meta|link|!DOCTYPE)' "$TMP_OUT" 2>/dev/null || true)"
+HTML_HITS="${HTML_HITS:-0}"
+if [ "$HTML_HITS" -gt 3 ]; then
+  warn "output contains $HTML_HITS raw HTML fragments - markitdown appears to have passed the source through unconverted"
+  warn "for HTML input use the dedicated converter instead: convert_html.sh <url-or-file> <output.md>"
+  suspect=1
+fi
+
 if [ "$suspect" -eq 1 ] && [ "$FORCE" -eq 0 ]; then
   err "conversion looks suspect - refusing to write $OUTPUT"
-  err "This is probably an image-only/scanned document needing OCR first."
-  err "Flag it to the human rather than ingesting a broken conversion."
-  err "Re-run with --force if the sparse output is genuinely correct."
+  # Report the diagnosis that actually applies, rather than always blaming OCR.
+  if [ "$HTML_HITS" -gt 3 ]; then
+    err "Diagnosis: the output is still raw HTML ($HTML_HITS markup fragments) -"
+    err "markitdown passed the source through without converting it."
+    err "Use the dedicated HTML converter instead:"
+    err "  convert_html.sh '$INPUT' $OUTPUT"
+  else
+    err "Diagnosis: almost no extractable text - probably an image-only/scanned"
+    err "document needing OCR first."
+    err "Flag it to the human rather than ingesting a broken conversion."
+  fi
+  err "Re-run with --force only if the output is genuinely correct as-is."
   exit 3
 fi
 

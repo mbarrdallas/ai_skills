@@ -30,12 +30,20 @@ The workflow definition lives in:
             │                        #   NOT in the shared skills/ directory
             │                        #   (no global auto-trigger).
             └── scripts/
-                └── convert_source.sh  # Converts a non-text source (PDF/docx/
+                ├── convert_source.sh  # Converts a non-text source (PDF/docx/
                                        #   URL) to markdown via markitdown for
                                        #   the raw/ layer. Guards against
-                                       #   overwriting immutable sources and
+                                       #   overwriting immutable sources,
                                        #   against silently ingesting
-                                       #   image-only/scanned PDFs.
+                                       #   image-only/scanned PDFs, and against
+                                       #   markitdown passing HTML through
+                                       #   unconverted (points at convert_html).
+                └── convert_html.sh    # HTML-specific converter (URL or local
+                                       #   file) - stdlib-only Python, strips
+                                       #   script/style/nav chrome, resolves
+                                       #   relative links, refuses output that
+                                       #   is still markup or too short, and
+                                       #   suggests a Wayback fallback on 403.
 ```
 
 Unlike `feature_development_workflow`, this workflow has no orchestrator, no

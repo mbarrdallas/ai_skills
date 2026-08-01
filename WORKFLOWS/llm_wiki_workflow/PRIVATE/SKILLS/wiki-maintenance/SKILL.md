@@ -63,17 +63,49 @@ Update `updated:` whenever a page is materially changed.
 ## Non-text source formats (PDF, docx, etc.)
 
 Sources that aren't already plain text/markdown must be converted before
-they can be read and ingested. Standard tool: **[`markitdown`](https://github.com/microsoft/markitdown)**
-(Microsoft's file-to-markdown CLI/library — handles PDF, docx, pptx, xlsx,
-images, audio, HTML, and more).
+they can be read and ingested.
 
 **Convention: always convert to markdown and discard the original.**
 
-**Use the bundled script — don't call `markitdown` by hand:**
+**Pick the right script for the input type — don't call converters by hand:**
+
+| Input | Use |
+|-------|-----|
+| PDF, docx, pptx, xlsx, images, audio | `scripts/convert_source.sh` (wraps [`markitdown`](https://github.com/microsoft/markitdown)) |
+| **HTML pages** (URL or saved `.html`) | `scripts/convert_html.sh` |
 
 ```bash
 scripts/convert_source.sh <input-file-or-url> raw/<domain>/<slug>.md [--discard-original] [--force]
+scripts/convert_html.sh   <input-file-or-url> raw/<domain>/<slug>.md [--force] [--keep-nav] [--min-words N]
 ```
+
+### Why HTML has its own script
+
+`markitdown` nominally supports HTML but is **unreliable on real-world pages**.
+On `webapps.dol.gov` — whose markup opens with a bogus `<!--doctype html-->`
+comment before the real DOCTYPE — it emitted the page's **raw HTML unchanged**,
+scripts and stylesheets included, and every text-volume heuristic passed it, so
+a `raw/` file full of `<script>` blocks entered the wiki unnoticed.
+
+`convert_html.sh` is HTML-specific, **stdlib-only Python** (no pip installs, no
+network libraries — so it stays deterministic and dependency-free) and:
+
+- keeps headings, paragraphs, nested lists, tables, blockquotes, code and
+  emphasis; **resolves relative links to absolute URLs** against the source
+  page so links still work from `raw/`
+- drops `<script>`/`<style>`/`<head>`/comments, and by default `<nav>`,
+  `<header>`, `<footer>`, `<aside>` chrome plus common government/CMS
+  boilerplate link text ("Skip to main content", "A to Z Index", …). Pass
+  `--keep-nav` to retain those regions.
+- **refuses to write output that still contains markup**, or that falls below
+  `--min-words` (default 50), which catches JS-rendered pages that return an
+  empty shell. Exits 3 and leaves the rejected output at `<output>.rejected`
+  for inspection.
+- on **HTTP 403** (common for `www.dol.gov` and similar), prints a ready-to-run
+  Wayback Machine fallback command instead of just failing
+
+`convert_source.sh` now also detects raw-HTML passthrough and exits 3 pointing
+you at `convert_html.sh`, so the failure above cannot recur silently.
 
 Resolve `scripts/` relative to this skill's directory (i.e.
 `<skill-dir>/scripts/convert_source.sh`), not the consuming repo's root.
@@ -88,6 +120,9 @@ default). It wraps `markitdown` and additionally:
 - **detects the image-only/scanned-PDF failure mode** via an
   alphanumeric-chars-per-page heuristic and **exits 3 without writing
   anything**, so a broken conversion can't be silently ingested
+- **detects raw-HTML passthrough** (markitdown returning the source unconverted)
+  and exits 3 with an accurate diagnosis pointing at `convert_html.sh` — rather
+  than misreporting it as a scanning problem
 - always cleans up temp downloads; deletes a *local* original only when
   explicitly passed `--discard-original`
 - prints the provenance facts to record on the source page
