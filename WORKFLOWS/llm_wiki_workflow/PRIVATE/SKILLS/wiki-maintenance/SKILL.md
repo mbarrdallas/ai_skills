@@ -107,13 +107,13 @@ network libraries — so it stays deterministic and dependency-free) and:
 `convert_source.sh` now also detects raw-HTML passthrough and exits 3 pointing
 you at `convert_html.sh`, so the failure above cannot recur silently.
 
-Resolve `scripts/` relative to this skill's directory (i.e.
-`<skill-dir>/scripts/convert_source.sh`), not the consuming repo's root.
+Resolve `scripts/` relative to **this skill's directory** (i.e.
+`<skill-dir>/scripts/convert.sh`), not the consuming repo's root.
 
-It accepts a **local path or an `http(s)` URL** — when the human supplies a
-link to a PDF, pass the URL directly rather than downloading separately (it
-sends a browser User-Agent, since some government/CDN hosts reject curl's
-default). It wraps `markitdown` and additionally:
+All three scripts accept a **local path or an `http(s)` URL** — when the human
+supplies a link, pass the URL directly rather than downloading separately (they
+send a browser User-Agent, since some government/CDN hosts reject curl's
+default). `convert_source.sh` wraps `markitdown` and additionally:
 
 - refuses to overwrite an existing `raw/` file (sources are immutable once
   ingested) unless `--force`

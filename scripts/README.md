@@ -105,9 +105,11 @@ Shared helpers (frontmatter parsing, pass/warn/fail counters, colored
 output) sourced by the validators and the install scripts. Not meant to be run
 directly.
 
-Note: the `wiki-maintenance` skill's `scripts/convert_source.sh` deliberately
-does **not** source `_lib.sh` — it runs from inside consuming repos where
-`ai_skills` is a submodule, so it must stay self-contained.
+Note: the `wiki-maintenance` skill's converter scripts (`convert.sh`,
+`convert_source.sh`, `convert_html.sh`) deliberately do **not** source
+`_lib.sh` — they run from inside consuming repos where `ai_skills` is a
+submodule, so they must stay self-contained. `convert.sh` is the single entry
+point; it detects the document type and delegates to the other two.
 
 ## Notes
 

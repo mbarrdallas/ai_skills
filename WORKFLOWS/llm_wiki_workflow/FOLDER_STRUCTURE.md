@@ -30,6 +30,11 @@ The workflow definition lives in:
             │                        #   NOT in the shared skills/ directory
             │                        #   (no global auto-trigger).
             └── scripts/
+                ├── convert.sh         # SINGLE ENTRY POINT - detects the doc
+                                       #   type and delegates to one of the two
+                                       #   below. Auto-retries via convert_html
+                                       #   if markitdown returns raw HTML.
+                                       #   Agents should call THIS.
                 ├── convert_source.sh  # Converts a non-text source (PDF/docx/
                                        #   URL) to markdown via markitdown for
                                        #   the raw/ layer. Guards against
