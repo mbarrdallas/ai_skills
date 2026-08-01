@@ -4,7 +4,7 @@ description: PRIMARILY audits a REAL, RUN workflow instance under ~/WORKSPACE/ac
 tools: read, write, bash, grep, find, ls
 skills: toyota-production-system, workflow-conventions
 spawns: none
-model: claude-sonnet-4-5
+model: claude-sonnet-5
 ---
 
 > Design reviewed via a grilling critique (design-agent, spawned via the

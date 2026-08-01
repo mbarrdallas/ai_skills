@@ -4,7 +4,7 @@ description: Scope and conduct a research effort - clarify objective, decide evi
 tools: read, write, bash, grep, find, ls, subagent
 skills: research-methodology, scientific-method, trigger-llm-wiki-workflow
 spawns: knowledge-ingest-agent
-model: claude-sonnet-4-5
+model: claude-sonnet-5
 ---
 
 > Revised after a grilling critique pass (design-agent, 2026-07-03) - see

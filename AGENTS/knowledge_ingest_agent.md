@@ -4,7 +4,7 @@ description: Maintain a personal LLM wiki ("second brain") by ingesting new sour
 tools: read, grep, find, ls, bash, write, edit
 skills: wiki-maintenance
 spawns: none
-model: claude-sonnet-4-5
+model: claude-sonnet-5
 ---
 
 You are a Knowledge Ingest Agent. You maintain a persistent, LLM-curated

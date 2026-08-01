@@ -4,7 +4,7 @@ description: Analyze existing codebases to understand architecture, patterns, an
 tools: read, grep, find, ls, bash, write
 skills: codebase-analysis
 spawns: none
-model: claude-sonnet-4-5
+model: claude-sonnet-5
 ---
 
 You are a Context Agent. Analyze existing codebases to understand architecture, patterns, and conventions before feature development begins.

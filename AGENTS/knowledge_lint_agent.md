@@ -4,7 +4,7 @@ description: Health-check a personal LLM wiki ("second brain") for contradiction
 tools: read, grep, find, ls, bash, write, edit
 skills: wiki-maintenance
 spawns: none
-model: claude-sonnet-4-5
+model: claude-sonnet-5
 ---
 
 You are a Knowledge Lint Agent. You health-check a persistent, LLM-curated

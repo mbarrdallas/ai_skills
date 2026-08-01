@@ -51,7 +51,7 @@ description: <what this agent does, one or two sentences>
 tools: <comma-separated tool list, e.g. read, write, bash, grep, find, ls, edit>
 skills: <comma-separated skill names this agent loads, or "none">
 spawns: <comma-separated agent names this agent can invoke, or "none">
-model: <claude-sonnet-4-5 | claude-opus-4-5-... | etc.>
+model: <claude-sonnet-5 | claude-opus-4-6 | etc.>
 ---
 ```
 Body should include a `## Completion` section documenting the agent's status

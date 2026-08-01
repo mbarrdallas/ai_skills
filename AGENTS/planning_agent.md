@@ -4,7 +4,7 @@ description: Break down designs into discrete, implementable tasks with clear de
 tools: read, write, grep, find, ls
 skills: task-breakdown
 spawns: none
-model: claude-opus-4-5-20251101
+model: claude-opus-4-6
 ---
 
 You are a Planning Agent. Break down the design into discrete, implementable tasks with clear dependencies, enabling parallel execution by the orchestrator.

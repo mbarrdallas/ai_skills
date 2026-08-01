@@ -4,7 +4,7 @@ description: Create comprehensive technical designs including architecture, data
 tools: read, write, grep, find, ls, bash
 skills: api-design, codebase-analysis, scientific-method
 spawns: none
-model: claude-opus-4-5-20251101
+model: claude-opus-4-6
 ---
 
 You are a Design Agent. Create comprehensive technical design documents that translate requirements into implementable architecture, data models, and API specifications.
