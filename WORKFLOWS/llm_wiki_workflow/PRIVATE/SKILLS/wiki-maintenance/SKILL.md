@@ -153,6 +153,76 @@ This keeps `raw/` uniformly plain-text/markdown, which is what makes it
 directly readable by any future agent session without re-running extraction
 tooling or depending on PDF/docx libraries being installed.
 
+## Traceability: every specific must trace to `raw/`
+
+**The wiki is a derivative of `raw/`, not a place to write down what you already
+know.** A page may summarize, restructure, synthesize across sources, and draw
+connections — that is the whole point. What it may **never** do is introduce a
+verifiable specific that does not appear in the sources it cites.
+
+This is the highest-consequence failure mode in the whole workflow, and it does
+not look like a failure when it happens. The fabricated detail is usually
+**factually correct** — which is precisely what makes it corrosive. Once
+recollection and sourced material are interleaved on the same page, no future
+reader (human or agent) can tell which claims are grounded and which are
+remembered, and the wiki quietly stops being trustworthy as a derivative of its
+sources.
+
+### What counts as a "verifiable specific"
+
+Statutory and legal citations · dollar amounts · percentages and rates · dates
+and deadlines · durations and thresholds · version/model numbers · form and
+standard numbers · named entities the source didn't name · anything presented as
+a direct quotation.
+
+Not covered (and encouraged): summary, paraphrase, structure, cross-linking,
+synthesis across multiple cited sources, and **arithmetic derived from sourced
+numbers** — provided the derivation is shown (e.g. "$684/week, i.e. $35,568
+annualized").
+
+### The rule
+
+**Before writing a specific, grep the page's `sources:` files for it.**
+
+```bash
+grep -rn "7.25" raw/            # the figure you're about to assert
+grep -rn "213(b)" raw/          # the citation you're about to assert
+```
+
+If there is no hit, you have exactly three legitimate options — never a fourth:
+
+1. **Write only what the source says.** If the source says "§13(b)", write
+   §13(b). Do not upgrade it to the full citation you happen to know.
+2. **Mark it explicitly as not-in-source** and file it to `BACKLOG.md`, e.g.
+   "(the precise citation is *not stated* in any ingested source — verify
+   before relying on it)".
+3. **Omit it.**
+
+**Never** silently supply the missing detail from your own knowledge. "I'm
+confident it's right" is not one of the options; correctness is not the same
+property as traceability.
+
+### Corollary: don't complete a source's shorthand
+
+A source's own abbreviation is data. If it writes "§13(b)", "Fact Sheet 19", or
+"the Act", reproduce that. Expanding, normalizing, or completing it is how
+unsourced specifics get introduced while feeling like tidying up.
+
+### Recording a correction after the fact
+
+If an unsourced specific is discovered later, do **not** quietly edit it away.
+Correct the page(s), file verification to `BACKLOG.md`, **and append a
+correction entry to `log.md`** — the log is append-only, so the record should
+show both the original claim and its retraction. Silently deleting the claim
+destroys the evidence that the wiki's sourcing discipline had slipped, which is
+exactly the signal a future lint pass needs.
+
+**Real incident.** An ingest of two DOL sources asserted `29 U.S.C. §213(b)(1)`
+on three pages as the citation for the FLSA motor-carrier overtime exemption.
+Both sources said only "§13(b)". The full citation appeared nowhere in `raw/`;
+it came from the model. It was plausibly correct, passed a clean `validate`
+run, and was caught only by a later `grep raw/` spot-check.
+
 ## Operation: Ingest
 
 **Performed by `knowledge-ingest-agent`.**
@@ -217,6 +287,13 @@ Run periodically (when asked, or when a domain has grown noticeably):
    but not sufficient — the meaningful orphan check is whether a page has
    any inbound link from *another content page*, not just from the index.
 3. Check for:
+   - **Unsourced specifics** — a verifiable specific (citation, figure, date,
+     threshold, quotation) asserted on a page but absent from every raw file
+     that page lists in `sources:`. Verify by grepping `raw/`, not by reading.
+     **Report it even if the fact is correct** — the defect is the broken
+     traceability. This category is invisible to structural validation, so
+     lint is the only thing that catches it. See the "Traceability" section
+     above.
    - **Contradictions** between pages (same fact stated differently).
    - **Stale claims** superseded by a newer source but not yet updated.
    - **Orphan pages** — no inbound links from any other *content* page.

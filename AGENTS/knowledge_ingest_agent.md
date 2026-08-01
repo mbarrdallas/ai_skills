@@ -95,6 +95,35 @@ Per the `wiki-maintenance` skill's Ingest and Query operations:
    pages you're actively touching.)
 4. Never silently overwrite a claim that a new source contradicts — surface
    the contradiction in the page text explicitly.
+5. **Every specific fact you write must trace to the raw source. Never supply
+   one from your own knowledge.** This is the single easiest way to corrupt a
+   wiki, because the fabricated fact is usually *correct*, which is exactly why
+   it's dangerous — once recollection and sourced material are mixed, no future
+   reader can tell which is which.
+
+   Applies to every **verifiable specific**: statutory/legal citations, dollar
+   amounts, percentages, dates, deadlines, durations, thresholds, version
+   numbers, standard/form numbers, proper nouns and quoted strings.
+
+   **Before writing any such specific, grep the page's `sources:` files for it.**
+   If it isn't there, you have exactly three legitimate options — never a
+   fourth:
+   - **write only what the source says** (e.g. the source says "§13(b)" → write
+     §13(b), *not* the full U.S. Code citation you happen to know);
+   - **mark it explicitly as not-in-source** on the page, e.g. "(the precise
+     citation is *not stated* in any ingested source)", and file it to
+     `BACKLOG.md` for verification; or
+   - **omit it**.
+
+   Real incident this rule exists to prevent: an ingest asserted
+   `29 U.S.C. §213(b)(1)` on three pages when the DOL sources said only
+   "§13(b)". The citation was plausibly correct and appeared nowhere in
+   `raw/`. See the `wiki-maintenance` skill's "Traceability" section.
+
+   Corollary: **do not "helpfully" expand, normalize, or complete a
+   source's own shorthand.** Deriving arithmetic from sourced numbers is fine
+   (e.g. $684/week → $35,568/year) if you show it as a derivation; supplying a
+   *new* fact is not.
 5. Keep the log and index current on every operation — they are the
    navigation mechanism for future sessions (including future instances of
    you and of `knowledge-lint-agent`).
@@ -119,7 +148,26 @@ agent's already-broad scope.
 
 ## Completion
 
-When finished:
+Before reporting `DONE`, run this self-check. Do not skip it — a `DONE` that is
+only accurate about what you thought to measure is how defects escape.
+
+1. **Traceability sweep (mandatory).** For each page you created or edited,
+   extract every verifiable specific you introduced — citations, figures,
+   dates, thresholds, form/standard numbers, quoted strings — and confirm each
+   appears in one of that page's `sources:` files. Grep, don't eyeball:
+
+   ```bash
+   grep -rn "<the exact figure or citation>" raw/
+   ```
+
+   Any specific with no hit must be corrected, explicitly marked not-in-source,
+   or removed (see Behavior rule 5) **before** you report `DONE`.
+2. **Verify, don't assume**, whatever the repo provides for it — e.g. if the
+   repo has a validator/CLI, run it and report the actual result rather than
+   asserting the wiki is clean.
+3. State in your report which BACKLOG items you opened, closed, or narrowed.
+
+Then:
 1. Output ONLY your status code as the last line.
 2. Do not write any text after the status code.
 3. Do not summarize, explain, or add closing remarks after the status.

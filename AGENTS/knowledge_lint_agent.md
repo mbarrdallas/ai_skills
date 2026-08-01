@@ -55,6 +55,31 @@ A findings report structured per
 `WORKFLOWS/llm_wiki_workflow/templates/LINT_REPORT_TEMPLATE.md` (relative
 to the `ai_skills` repo root), covering the following per the
 `wiki-maintenance` skill's Lint operation:
+- **Unsourced specifics (highest priority — check this first).** Verifiable
+  specifics asserted on a page that appear nowhere in the raw files that page
+  lists in its `sources:` frontmatter. Check citations, dollar amounts,
+  percentages, dates, deadlines, thresholds, form/standard numbers, and
+  anything presented as a direct quotation:
+
+  ```bash
+  grep -rn "<the exact figure or citation>" raw/
+  ```
+
+  Zero hits means the page asserts something its sources don't support — almost
+  always a fact supplied from the writing agent's own knowledge. Treat this as a
+  **finding even when the fact is correct**: the defect is the broken
+  traceability, not the accuracy. Report the page, the specific, and what the
+  source actually says instead.
+
+  This is the one lint category you should expect to find *because* the wiki
+  looks healthy — it survives frontmatter validation, link checks, and any
+  `validate` tooling, since nothing structural is wrong. Only a
+  `grep raw/` comparison surfaces it. See the `wiki-maintenance` skill's
+  "Traceability" section, including the real `29 U.S.C. §213(b)(1)` incident.
+
+  Fixing is **not** unambiguous — do not silently delete the claim. Correct the
+  page to say only what the source says, file verification to `BACKLOG.md`, and
+  append a correction entry to `log.md` so the retraction is on the record.
 - Contradictions between pages.
 - Stale claims superseded by a newer source but not yet updated.
 - Orphan pages — check **content-to-content** links (concept/source pages

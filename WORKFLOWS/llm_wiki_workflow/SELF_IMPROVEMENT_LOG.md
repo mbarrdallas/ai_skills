@@ -84,3 +84,61 @@ Also fixed `FOLDER_STRUCTURE.md`, which had never listed the pre-existing
 `BACKLOG_TEMPLATE.md` either.
 
 **Related:** commit `231c3e8`.
+
+## 2026-08-01: Unsourced specifics — traceability was never actually required
+
+**Issue:** An ingest of two DOL sources asserted `29 U.S.C. §213(b)(1)` on three
+wiki pages as the citation for the FLSA motor-carrier overtime exemption. Both
+sources said only "§13(b)". The full U.S. Code citation appeared **nowhere** in
+`raw/` — it came from the model's own knowledge. It passed a clean
+`brain validate` run (0 errors, 0 warnings) and was caught only by a later
+manual `grep raw/` spot-check.
+
+**Learning (three distinct ones):**
+
+1. **The rule was never written down.** Both the skill and
+   `knowledge-ingest-agent` said "don't invent facts" only in passing, and never
+   defined what that meant operationally or how to check it. Every task brief
+   for this workflow had been *manually* restating "never invent a fact" —
+   which is a strong signal the rule belonged in the definitions, not in the
+   prompt. It was working only because the human kept remembering to say it.
+2. **This failure mode is invisible to every automated check.** Frontmatter
+   validation, wikilink checks, orphan detection, and the whole `wikitool`
+   validator all pass, because nothing *structural* is wrong. Only comparing
+   the page's assertions against its own `sources:` files finds it.
+3. **The fabricated fact is usually correct, and that's what makes it
+   dangerous.** A wrong fact gets challenged; a right-but-unsourced fact gets
+   trusted and propagated. The defect isn't accuracy, it's that no future reader
+   can distinguish grounded claims from remembered ones. Discipline has to be
+   framed around *traceability*, not *correctness*, or agents will
+   self-authorize whenever they feel confident.
+
+**Improvement:**
+- `wiki-maintenance` SKILL.md: new **"Traceability: every specific must trace to
+  `raw/`"** section defining what counts as a verifiable specific, what is
+  explicitly still allowed (summary, synthesis, shown arithmetic), the
+  `grep raw/` pre-write check, and the **only three legitimate options** when
+  there's no hit (say only what the source says / mark not-in-source + BACKLOG /
+  omit) — with "I'm confident it's right" explicitly excluded. Added the
+  "don't complete a source's shorthand" corollary, since expanding "§13(b)" felt
+  like tidying rather than fabricating. Added the append-a-correction-to-`log.md`
+  rule so retractions are on the record instead of quietly edited away.
+- `knowledge-ingest-agent`: new Behavior rule 5 with the same content, plus a
+  **mandatory traceability sweep in `## Completion`** — extract every specific
+  introduced, grep for it, resolve misses *before* reporting `DONE`. Its
+  Completion section previously had no verification step at all, which is why a
+  `DONE` could be sincere and still wrong.
+- `knowledge-lint-agent`: **"Unsourced specifics" added as the FIRST and
+  highest-priority lint category**, with the grep method, the "report it even if
+  correct" instruction, and an explicit warning that this fix is *not*
+  unambiguous — correct the page, file to BACKLOG, append to `log.md`; never
+  silently delete.
+
+**Why it went in all three:** the ingest rule prevents it, the lint rule catches
+it when prevention fails, and the skill holds the shared definition so the two
+agents can't drift. Per the workflow's own ingest/lint separation, the agent that
+writes the pages should not be the only thing standing between a fabricated
+citation and the wiki.
+
+**Related:** `mariamas_brain` commit 15b487a (the correction), its BACKLOG item
+to verify the real citation, and the `wiki/log.md` retraction entry.
