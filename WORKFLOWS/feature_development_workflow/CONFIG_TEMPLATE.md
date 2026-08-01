@@ -48,7 +48,7 @@ quality:
 agents:
   context_agent:
     enabled: true  # false for greenfield
-    use_scout: true  # use scout for fast recon before deep analysis
+    use_scout: true  # run scout-agent for fast recon before deep analysis
   documentation_agent:
     enabled: true
     generate_api_docs: true
@@ -108,7 +108,7 @@ The orchestrator has discretion over budget, but guidance can be provided:
 
 Enable/disable specific agents or features:
 - Context Agent can be disabled for greenfield projects
-- `use_scout`: When true, runs scout (Haiku) for fast recon before Context Agent (Sonnet) does deep analysis. Recommended for large codebases.
+- `use_scout`: When true, runs `scout-agent` (Sonnet 5) for fast recon before Context Agent (Sonnet 5) does deep analysis. Recommended for large codebases. Scout compresses a large codebase into exact paths/line ranges plus real code excerpts, so context-agent doesn't read broadly to find the relevant parts.
 - Documentation Agent options control what docs are generated
 
 ## Example Configurations

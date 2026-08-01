@@ -90,7 +90,7 @@ all of: `name`, `description`, `tools`, `skills`, `spawns`, `model`. Checks
 `name` is kebab-case and matches the file's snake_case name, that `skills:`
 entries resolve to real skills, that `spawns:` entries resolve to real agent
 files (warn-only — some references may be intentionally aspirational, e.g.
-a not-yet-built "scout" agent), and that a `## Completion` section exists
+an intentionally aspirational future agent), and that a `## Completion` section exists
 (status-code convention).
 
 **`validate_workflow.sh`** — `<workflow-dir>/WORKFLOW.md` must exist with

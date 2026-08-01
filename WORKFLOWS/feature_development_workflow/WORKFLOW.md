@@ -15,7 +15,7 @@ Human Goal Statement
         │
         ▼
 ┌───────────────────┐
-│  Scout (Haiku)    │◄──── (Optional, if use_scout: true)
+│  Scout (Sonnet 5) │◄──── (Optional, if use_scout: true)
 │  Fast recon       │
 └────────┬──────────┘
          │ Scout findings
@@ -185,6 +185,7 @@ Human Goal Statement
 
 | Agent | Role | Skills |
 |-------|------|--------|
+| Scout Agent *(optional)* | Fast codebase recon, compressed handoff | codebase-analysis |
 | Context Agent | Analyze existing codebase | codebase-analysis |
 | Requirements Agent | Gather and document requirements | scientific-method |
 | Design Agent | Create technical design | api-design, codebase-analysis, scientific-method |

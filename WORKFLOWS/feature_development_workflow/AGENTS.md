@@ -5,7 +5,8 @@ Agents used in this workflow and their roles.
 ## Workflow Sequence
 
 ```
-Phase 1: Context     → context-agent (existing projects only)
+Phase 1: Context     → [scout →] context-agent (existing projects only;
+                        scout only if use_scout: true)
 Phase 2: Requirements → requirements-agent
 Phase 3: Design      → design-agent
 Phase 4: Planning    → planning-agent
@@ -22,10 +23,24 @@ Phase 7: Sign-off    → orchestrator reviews
 **Role:** Coordinate entire workflow, manage parallel tasks, track state and budget.
 **Spawns:** All other agents
 
+### Scout Agent (Optional)
+**Name:** `scout-agent` (deliberately *not* `scout` — pi ships a bundled example
+agent named `scout` on Haiku, and agents are keyed by name, so the shorter name
+would collide ambiguously)
+**Location:** `AGENTS/scout_agent.md`
+**Model:** Sonnet 5
+**Role:** Fast codebase recon before Context Agent's deep analysis. Returns
+compressed findings (exact paths + line ranges + real code excerpts) so
+downstream agents don't re-read the codebase to find what matters.
+**Runs when:** `use_scout: true` in workflow config; recommended for large
+codebases, skipped for greenfield.
+**Inputs:** Code repository path, human goal statement
+**Outputs:** Scout findings (in-response, consumed by Context Agent)
+
 ### Context Agent
 **Model:** Sonnet
 **Role:** Analyze existing codebase before modifications.
-**Inputs:** Code repository path
+**Inputs:** Code repository path, scout findings (optional)
 **Outputs:** `PROJECT_CONTEXT.md`
 
 ### Requirements Agent

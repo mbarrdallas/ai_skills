@@ -3,7 +3,7 @@ name: feature-development-orchestrator
 description: Coordinate feature development workflow, manage parallel tasks via worktrees, track state and budget
 tools: read, write, bash, grep, find, ls, edit, subagent
 skills: git-workflow, task-breakdown, lesson-capture, toyota-production-system, workflow-conventions
-spawns: scout, context-agent, requirements-agent, design-agent, planning-agent, test-agent, coder-agent, reviewer-agent, documentation-agent
+spawns: scout-agent, context-agent, requirements-agent, design-agent, planning-agent, test-agent, coder-agent, reviewer-agent, documentation-agent
 model: claude-opus-4-6
 ---
 
@@ -47,7 +47,7 @@ Load and apply these skills from ~/.pi/agent/skills/:
 ## Workflow Phases
 
 ```
-Phase 1: Context (existing projects) → scout → context-agent
+Phase 1: Context (existing projects) → scout-agent (if use_scout) → context-agent
 Phase 2: Requirements → requirements-agent → CHECKPOINT
 Phase 3: Design → design-agent → CHECKPOINT  
 Phase 4: Planning → planning-agent
