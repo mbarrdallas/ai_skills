@@ -23,12 +23,19 @@ The workflow definition lives in:
 └── PRIVATE/
     └── SKILLS/
         └── wiki-maintenance/
-            └── SKILL.md             # Workflow-private skill: domain-agnostic
-                                     #   ingest/query/lint procedure. Only
-                                     #   used by knowledge_ingest_agent within
-                                     #   this workflow, so it's intentionally
-                                     #   NOT in the shared skills/ directory
-                                     #   (no global auto-trigger).
+            ├── SKILL.md             # Workflow-private skill: domain-agnostic
+            │                        #   ingest/query/lint procedure. Only
+            │                        #   used by knowledge_ingest_agent within
+            │                        #   this workflow, so it's intentionally
+            │                        #   NOT in the shared skills/ directory
+            │                        #   (no global auto-trigger).
+            └── scripts/
+                └── convert_source.sh  # Converts a non-text source (PDF/docx/
+                                       #   URL) to markdown via markitdown for
+                                       #   the raw/ layer. Guards against
+                                       #   overwriting immutable sources and
+                                       #   against silently ingesting
+                                       #   image-only/scanned PDFs.
 ```
 
 Unlike `feature_development_workflow`, this workflow has no orchestrator, no

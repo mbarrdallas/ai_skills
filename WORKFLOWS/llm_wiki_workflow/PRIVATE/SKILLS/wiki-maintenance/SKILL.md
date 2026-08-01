@@ -69,9 +69,33 @@ images, audio, HTML, and more).
 
 **Convention: always convert to markdown and discard the original.**
 
+**Use the bundled script — don't call `markitdown` by hand:**
+
 ```bash
-markitdown "<original file>" -o raw/<domain>/<slug>.md
+scripts/convert_source.sh <input-file-or-url> raw/<domain>/<slug>.md [--discard-original] [--force]
 ```
+
+Resolve `scripts/` relative to this skill's directory (i.e.
+`<skill-dir>/scripts/convert_source.sh`), not the consuming repo's root.
+
+It accepts a **local path or an `http(s)` URL** — when the human supplies a
+link to a PDF, pass the URL directly rather than downloading separately (it
+sends a browser User-Agent, since some government/CDN hosts reject curl's
+default). It wraps `markitdown` and additionally:
+
+- refuses to overwrite an existing `raw/` file (sources are immutable once
+  ingested) unless `--force`
+- **detects the image-only/scanned-PDF failure mode** via an
+  alphanumeric-chars-per-page heuristic and **exits 3 without writing
+  anything**, so a broken conversion can't be silently ingested
+- always cleans up temp downloads; deletes a *local* original only when
+  explicitly passed `--discard-original`
+- prints the provenance facts to record on the source page
+
+Exit codes: `0` ok, `1` usage/precondition, `2` markitdown failed,
+`3` conversion suspect (refused).
+
+Rules that still apply:
 
 - Save the markdown output directly into `raw/<domain>/` under a
   kebab-case slug of the original filename — this *is* the raw source going
@@ -79,12 +103,16 @@ markitdown "<original file>" -o raw/<domain>/<slug>.md
 - Discard the original binary (PDF/docx/etc.) once the markdown conversion
   is confirmed readable and reasonably faithful to the source. Do not keep
   both.
-- Note the conversion in the source page (which tool, and that the original
-  was discarded) so provenance is clear to future readers.
-- If `markitdown` produces a garbled or clearly incomplete conversion (e.g.
-  a scanned/image-only PDF with no extractable text layer), flag this to
-  the human rather than ingesting a broken conversion — OCR or another tool
-  may be needed first.
+- Note the conversion in the source page (which tool, source URL if any, and
+  that the original was discarded) so provenance is clear to future readers.
+- **Always read the conversion in full and spot-check fidelity before
+  ingesting.** The script's heuristic catches *empty* output, not *garbled*
+  output — mangled tables, dropped columns, and scrambled reading order can
+  still pass. If the conversion is garbled or clearly incomplete, flag it to
+  the human rather than ingesting it; OCR or another tool may be needed
+  first.
+- If `markitdown` is missing, the script prints the install command
+  (`pipx install markitdown[all]`) rather than failing obscurely.
 
 This keeps `raw/` uniformly plain-text/markdown, which is what makes it
 directly readable by any future agent session without re-running extraction
