@@ -24,3 +24,40 @@ Track improvements made to this skill based on real-world usage.
 **Improvement:** Added to coder-agent behavior rule #1: "Read relevant documentation first". Added to orchestrator rule #14: include doc paths in coder-agent task instructions.
 
 **Related:** stats_dashboard_tui lessons: pi-extension-factory-format, missing-integration-testing
+
+## 2026-08-01: Standardize Python tooling on ruff (drop black/isort)
+
+**Issue:** The Python overlay's Tools section recommended `black` + `isort` +
+`ruff` + `flake8` + `pylint` side by side, with `[tool.black]`, `[tool.isort]`,
+and `[tool.ruff]` config blocks all present in the same example
+`pyproject.toml`. That's contradictory guidance: two formatters (`black` and
+`ruff format`) in one repo fight over the same files, and three linters is
+noise. The example also used the pre-0.2 `select` layout directly under
+`[tool.ruff]`, which is deprecated and now warns.
+
+**Learning:** Recommend exactly ONE tool per job. `ruff` subsumes `black`
+(formatting), `isort` (import sorting), and `flake8`/`pylint` (linting) in a
+single much faster binary with one config block. It does NOT type-check, so
+`mypy` remains separately necessary - that distinction has to be stated
+explicitly or readers assume ruff covers everything.
+
+**Improvement:** Rewrote the Tools section of `overlays/python.md`:
+- `ruff format` + `ruff check` as the single formatting/linting standard, with
+  an explicit "do not add black or isort alongside it" warning
+- corrected config to the current `[tool.ruff.lint]` layout, with a note that
+  `select` under `[tool.ruff]` is the deprecated form
+- expanded the rule selection beyond `E/F/I/N/W` to include `UP`, `B`, `SIM`
+- called out that ruff does not type-check, so `mypy` is still required
+- added a "if the project is fully type-hinted, enforce it" subsection -
+  unchecked type hints are decoration that silently drifts
+- added a `ruff-pre-commit` config example
+- demoted `black`/`isort`/`flake8`/`pylint`/`pyright` to an "Alternatives (only
+  if a project already standardizes on them)" note, so they're recognizable in
+  existing code but not introduced into new projects
+- noted in the Imports section that ordering is enforced by `ruff check
+  --select I`, not by hand
+
+**Related:** `wiki_tool` run instance - the `wikitool` CLI built for
+`mariamas_brain` used `ruff` only (no black/isort), which is what surfaced the
+overlay's stale advice. That build was also fully type-hinted but shipped with
+no `mypy` configured, which motivated the new "enforce it" subsection.

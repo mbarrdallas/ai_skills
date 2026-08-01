@@ -145,6 +145,9 @@ class UserService:
 
 ## Imports
 
+Enforced automatically by `ruff check --select I` (see Tools) — don't sort by
+hand.
+
 ```python
 # Standard library first
 import os
@@ -377,36 +380,80 @@ for name, score in zip(names, scores):
 
 ## Tools
 
+**Use `ruff` for both linting and formatting.** It replaces `black` (formatting),
+`isort` (import sorting), and `flake8`/`pylint` (linting) with a single,
+dramatically faster tool and one config block. Do not add `black` or `isort`
+alongside it — two formatters in one repo means fighting over the same files.
+
 ```bash
-# Formatting
-black .                    # Auto-format code
-isort .                    # Sort imports
+# Format (replaces black + isort)
+ruff format .              # Auto-format code
+ruff check --select I --fix .   # Sort imports
 
-# Linting
-ruff check .               # Fast linter (recommended)
-flake8 .                   # Classic linter
-pylint .                   # Comprehensive linter
+# Lint
+ruff check .               # Lint
+ruff check --fix .         # Lint and auto-fix what's safely fixable
 
-# Type checking
+# Type checking (ruff does NOT type-check - still need this)
 mypy .                     # Static type checker
-pyright .                  # Alternative type checker
-
-# Configuration in pyproject.toml
 ```
+
+Ruff's formatter is intentionally near-identical to `black`, so adopting it in
+an existing black-formatted codebase produces little or no churn.
+
+### Configuration
+
+All config lives in `pyproject.toml`:
 
 ```toml
 # pyproject.toml
-[tool.black]
-line-length = 88
-
-[tool.isort]
-profile = "black"
-
 [tool.ruff]
 line-length = 88
-select = ["E", "F", "I", "N", "W"]
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort (import sorting)
+    "N",   # pep8-naming
+    "UP",  # pyupgrade - modernize syntax
+    "B",   # flake8-bugbear - likely bugs
+    "SIM", # flake8-simplify
+]
 
 [tool.mypy]
 python_version = "3.11"
 strict = true
 ```
+
+**Note the `[tool.ruff.lint]` section.** Putting `select` directly under
+`[tool.ruff]` is the deprecated pre-0.2 layout and now emits a warning — lint
+rules belong under `[tool.ruff.lint]`.
+
+### If the project is fully type-hinted, enforce it
+
+Type hints that are never checked are decoration. If the codebase uses hints
+(and per the Type Hints section above, it should), wire `mypy` into the same
+command set as `ruff` — otherwise the hints silently drift out of sync with
+reality.
+
+### Pre-commit
+
+```yaml
+# .pre-commit-config.yaml
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.1
+    hooks:
+      - id: ruff-check
+        args: [--fix]
+      - id: ruff-format
+```
+
+### Alternatives (only if a project already standardizes on them)
+
+Don't introduce these into a new project; recognize them in an existing one:
+`black` + `isort` (the pre-ruff standard), `flake8`, `pylint` (broader but much
+slower), `pyright` (alternative type checker, stronger inference than mypy).
