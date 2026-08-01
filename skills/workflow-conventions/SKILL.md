@@ -341,6 +341,19 @@ scripts/validate_agent.sh [agent-file.md]     # one agent, or all AGENTS/*
 scripts/validate_workflow.sh [workflow-dir]   # one workflow, or all WORKFLOWS/*
 ```
 
+Validation checks *structure*; it does **not** check that a skill or agent is
+actually visible to the harness. That's a separate, equally silent failure
+mode — an unlinked skill validates perfectly and still never triggers. Use:
+
+```bash
+scripts/install_all.sh            # link all public skills + agents into the harness
+scripts/install_all.sh --check    # report drift only; exit 1 if anything is unlinked
+```
+
+Run `install_all.sh --check` alongside `validate_all.sh` after adding a skill
+or agent. See `scripts/README.md` for flags (`--thirdparty`, `--private`,
+`--prune`) and the safety guarantees.
+
 Exit code is `1` if any `FAIL` was found, `0` otherwise (warnings never
 fail the run — they surface convention drift like naming mismatches or
 thin descriptions without blocking work). See `scripts/README.md` for full
