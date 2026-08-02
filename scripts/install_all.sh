@@ -10,6 +10,9 @@
 #   install_all.sh --check        # report drift only, change nothing; exit 1 if out of sync
 #   install_all.sh --prune        # also remove broken links pointing into this repo
 #
+# Also wires up this repo's git hooks (scripts/install_hooks.sh) so staged
+# skills/agents/workflows are validated on commit.
+#
 # Flags accepted by only one sub-script (--thirdparty for skills, --private for
 # agents) are passed to the one that understands them and dropped for the other.
 set -uo pipefail
@@ -32,9 +35,18 @@ overall_rc=0
 "$SCRIPT_DIR/install_agents.sh" ${agent_args[@]+"${agent_args[@]}"}; rc=$?
 [ "$rc" -ne 0 ] && overall_rc=1
 
+# Git hooks live in this repo only (they validate THIS repo's contents), so
+# they take no skill/agent flags - just --check/--quiet where relevant.
+hook_args=()
+for a in "$@"; do
+  case "$a" in --check|--quiet) hook_args+=("$a") ;; esac
+done
+"$SCRIPT_DIR/install_hooks.sh" ${hook_args[@]+"${hook_args[@]}"}; rc=$?
+[ "$rc" -ne 0 ] && overall_rc=1
+
 echo ""
 if [ "$overall_rc" -eq 0 ]; then
-  echo "All skills and agents are linked into the pi harness."
+  echo "All skills and agents are linked into the pi harness; git hooks installed."
 else
   echo "Skills/agents are out of sync or an error occurred - see above."
 fi

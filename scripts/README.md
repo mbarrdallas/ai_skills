@@ -112,6 +112,48 @@ Note: the `wiki-maintenance` skill's converter scripts (`convert.sh`,
 submodule, so they must stay self-contained. `convert.sh` is the single entry
 point; it detects the document type and delegates to the other two.
 
+## `install_hooks.sh`
+
+Wires this repo's git hooks to the version-controlled `scripts/hooks/`
+directory via `git config core.hooksPath scripts/hooks`.
+
+```bash
+./scripts/install_hooks.sh            # install
+./scripts/install_hooks.sh --check    # report only; exit 1 if not installed
+./scripts/install_hooks.sh --uninstall
+```
+
+`core.hooksPath` is **local to each clone** (it lives in `.git/config`, which
+isn't committed), so every clone must run this once. `install_all.sh` does it
+for you.
+
+Hooks are kept in `scripts/hooks/` rather than copied into `.git/hooks/`
+because `.git/hooks` isn't version controlled: a copy would drift silently and
+wouldn't exist at all for a fresh clone.
+
+### `scripts/hooks/pre-commit`
+
+Validates **only what's staged**, so a docs-only commit costs ~0.2s instead of
+the ~6s a full `validate_all.sh` sweep takes.
+
+1. **Shell syntax** (`bash -n`) on staged `*.sh`, plus a warning if a script is
+   committed non-executable.
+2. **Staged skills / agents / workflows** via the matching `validate_*.sh`.
+   Covers workflow-private items under `WORKFLOWS/*/PRIVATE/` too.
+   If a *shared* file changes (`_lib.sh`, any `validate_*.sh`, or the
+   `workflow-conventions` skill) it falls back to a full `validate_all.sh`,
+   since those can invalidate anything in the repo.
+3. **Harness links**, but only when a skill/agent is **added or renamed**, and
+   only if the harness directory exists on this machine — so a fresh clone or
+   CI box isn't blocked by local environment state. This enforces the documented
+   rule that a new skill must be linked at creation time, since an unlinked
+   skill silently never triggers.
+4. **Warns** if a staged file also has unstaged changes — validation runs
+   against the working tree, so what was checked isn't quite what's committed.
+
+`FAIL` blocks the commit; `WARN` doesn't. Bypass deliberately with
+`git commit --no-verify` or `PRECOMMIT_SKIP=1 git commit ...`.
+
 ## Notes
 
 - Written in portable POSIX-ish bash + `awk`/`sed`/`grep -E` — tested on

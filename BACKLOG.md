@@ -5,7 +5,9 @@
   assert the safety properties: no clobbering of real files, external-pointing
   links untouched, `--check` read-only, `--prune` only removing broken
   in-repo links. (found via: adding the install scripts, 2026-08-01)
-- [ ] Consider wiring `install_all.sh --check` into a pre-commit hook or CI
+- [x] Wire validation into a pre-commit hook. DONE 2026-08-01: `scripts/hooks/pre-commit` + `scripts/install_hooks.sh` (via `core.hooksPath`), installed by `install_all.sh`. Validates only staged items; harness-link check runs only when a skill/agent is added. CI is still open below.
   alongside `validate_all.sh`, so a new skill/agent that was never symlinked
   into the harness fails loudly instead of silently never triggering.
   (found via: adding the install scripts, 2026-08-01)
+- [ ] Run the same validation in CI, so the pre-commit hook isn't the only
+  gate (it is per-clone, and `--no-verify` bypasses it silently).
