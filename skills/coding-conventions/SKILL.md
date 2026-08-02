@@ -291,6 +291,57 @@ def test_user_creation():
 
 **Rule:** Every test must have assertions that would FAIL if the code was wrong. If a test would pass with an empty implementation, it's not a real test.
 
+### Every bug fix requires a regression test
+
+**Rule: never fix a bug without adding a test that fails against the broken
+code and passes against the fix.** No exceptions for "obvious" or "trivial"
+fixes — those are the ones that come back, because nothing is holding them
+down.
+
+A bug is proof that some behavior was never covered. Fixing the code without
+adding the test leaves that gap exactly as wide as it was, and the same defect
+can be reintroduced by the next refactor with nothing to catch it.
+
+**The order matters. Write the test first and watch it fail:**
+
+1. **Reproduce** — write a test that fails *because of the bug*.
+2. **Verify the failure is the right one.** Read the assertion message. A test
+   that fails on an import error, a typo, or a fixture problem proves nothing.
+   If you can't make it fail, you have not understood the bug yet — stop and
+   keep investigating rather than "fixing" something you can't demonstrate.
+3. **Fix** the code.
+4. **Confirm** the test now passes, and that nothing else broke.
+
+A test written *after* the fix, never observed failing, is unverified: it may
+assert the wrong thing, exercise the wrong path, or pass for an unrelated
+reason. If you must add one retroactively, temporarily revert the fix to prove
+the test catches it, then restore the fix.
+
+**Write the test at the level the bug actually lived at.** A logic bug wants a
+unit test; a bug in how two components interact wants an integration test. A
+unit test with the buggy collaborator mocked out will not catch a recurrence.
+
+**Say what it's protecting.** A regression test's docstring should record the
+original defect — what broke, and why the obvious-looking code was wrong.
+Otherwise a future reader deletes it as redundant:
+
+```python
+def test_summary_survives_index_regeneration():
+    """Regression: regenerating an index must not overwrite curated summaries.
+
+    A blanket `if severity == WARNING: continue` made the repair branch below
+    unreachable, so a single drift warning triggered full regeneration and
+    replaced every human-written summary with "<placeholder summary>".
+    Verified to FAIL against the pre-fix code.
+    """
+```
+
+**Also fix the class, not just the instance.** Once the test is green, ask
+whether the same mistake exists elsewhere — a second copy of the function, a
+sibling code path, the same pattern in another module. If the bug came from a
+generator, template, or duplicated helper, fix it there so it stops
+re-manufacturing itself.
+
 ## Applying to Existing Codebases
 
 1. **First, observe** - Identify existing patterns

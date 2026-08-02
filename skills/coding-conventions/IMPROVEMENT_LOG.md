@@ -61,3 +61,45 @@ explicitly or readers assume ruff covers everything.
 `mariamas_brain` used `ruff` only (no black/isort), which is what surfaced the
 overlay's stale advice. That build was also fully type-hinted but shipped with
 no `mypy` configured, which motivated the new "enforce it" subsection.
+
+## 2026-08-01: Require a regression test for every bug fix
+
+**Issue:** The skill said tests must have real assertions, but said nothing
+about what happens when a *bug* is found. Nothing required a bug fix to come
+with a test, and nothing required that test to be observed failing first. In
+the `wiki_tool` run this gap was visible three times: unreachable dead code, a
+data-loss bug in a file-rewriting path, and output that failed the tool's own
+validator - all fixed at some point in a codebase with 115 passing tests,
+because the tests covered what someone thought to write, not what had actually
+broken.
+
+**Learning:**
+- A bug is *evidence* that some behavior was never covered. Fixing the code
+  alone leaves the coverage gap exactly as wide as before, so the next refactor
+  can reintroduce it silently.
+- **Order matters more than existence.** A test written after the fix and never
+  observed failing is unverified - it can assert the wrong thing, exercise the
+  wrong path, or pass for an unrelated reason. Writing it first and watching it
+  fail is what proves it actually catches the defect. (When the three
+  index-regeneration fixes were made, each new test was explicitly re-run
+  against the pre-fix code to confirm it failed; two of them would otherwise
+  have looked fine while testing nothing.)
+- "I can't make it fail" means the bug isn't understood yet - that is a signal
+  to keep investigating, not to proceed with the fix.
+- Level matters: a unit test with the buggy collaborator mocked out will not
+  catch a recurrence of an integration bug.
+- Regression tests get deleted as redundant unless they say what they protect,
+  so the docstring must record the original defect.
+
+**Improvement:** Added an "Every bug fix requires a regression test" subsection
+to the Testing Conventions section of SKILL.md: the rule, the four-step
+reproduce-verify-fix-confirm order, the instruction to verify the failure is
+the *right* failure, the retroactive fallback (temporarily revert the fix to
+prove the test catches it), test-level guidance, a worked docstring example
+from a real incident, and a closing "fix the class, not just the instance"
+note that ties back to fixing generators rather than their output.
+
+**Related:** `wiki_tool` run instance
+(`lessons/index-regeneration-data-loss.md`), and the parallel hardening of
+`test-agent` and `reviewer-agent` in the `feature_development_workflow`
+SELF_IMPROVEMENT_LOG.
