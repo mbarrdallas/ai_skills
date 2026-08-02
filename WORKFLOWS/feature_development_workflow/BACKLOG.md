@@ -14,7 +14,7 @@ Tasks and enhancements to implement later for this workflow.
 
 ## Filed 2026-08-01 (from the wiki_tool run)
 
-- [ ] **Resolve the 2 persistent `orchestrator_agent.md` validator warnings.**
+- [x] **Resolve the 2 persistent `orchestrator_agent.md` validator warnings.** DONE 2026-08-01.
   `validate_agent.sh` has warned on both for a while and they are now the only
   warnings left in the repo (they surface 3x because the file is reachable via
   `PRIVATE/AGENTS/` and the `agents/` symlink):
@@ -26,7 +26,7 @@ Tasks and enhancements to implement later for this workflow.
     even though every other agent does and the orchestrator is what interprets
     those codes from the agents it spawns.
 
-- [ ] **reviewer-agent should be required to check for unreachable/dead code.**
+- [x] **reviewer-agent should be required to check for unreachable/dead code.** DONE 2026-08-01.
   In the wiki_tool run, `compute_index_repairs` opened with a blanket
   `if severity == WARNING: continue` that made a whole repair branch below it
   unreachable. reviewer-agent passed it: its D4 check used
@@ -34,22 +34,22 @@ Tasks and enhancements to implement later for this workflow.
   115 tests also passed. See `lessons/index-regeneration-data-loss.md` in the
   run instance.
 
-- [ ] **test-agent should be required to write a positive test alongside any
-  "zero findings" assertion.** The run produced
+- [x] **test-agent should be required to write a positive test alongside any
+  "zero findings" assertion.** DONE 2026-08-01. The run produced
   `test_update_dry_run_zero_changes`, asserting 0 repairs against the live
   wiki - which passed only BECAUSE the repair path was dead code. A
   "0 findings" assertion cannot distinguish "clean" from "detection is broken",
   and this one would have actively resisted the fix. Pair every such assertion
   with a known-bad fixture proving the detector fires.
 
-- [ ] **test-agent should test destructive/mutating code paths against content
-  that has something to lose.** All repair tests used synthetic fixtures with
+- [x] **test-agent should test destructive/mutating code paths against content
+  that has something to lose.** DONE 2026-08-01. All repair tests used synthetic fixtures with
   empty summary fields, so "preserves the human-written summary" was not even
   expressible - and the tool wiped real curated summaries on its first live
   invocation.
 
-- [ ] **Add a round-trip property test convention for tools that both write and
-  validate a format.** wiki_tool's `update` wrote a log entry that its own
+- [x] **Add a round-trip property test convention for tools that both write and
+  validate a format.** DONE 2026-08-01. wiki_tool's `update` wrote a log entry that its own
   `validate` rejected as malformed. "Everything this tool emits must pass its
   own validator" is a cheap, high-value invariant that would have caught it.
 

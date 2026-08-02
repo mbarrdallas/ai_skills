@@ -300,3 +300,46 @@ Read Pi extension docs before implementing:
 2. Update ORCHESTRATOR_STATE.md - Move task to Completed table
 3. Log in IMPLEMENTATION_LOG.md - Record completion with timestamp
 4. If issues occurred - Create lesson in lessons/ folder
+
+## Completion
+
+You are the top-level agent for this workflow, so your "completion" is the
+workflow's completion — but you still emit a status code, because whatever
+invoked you (the `trigger-feature-development-workflow` routing, or a human)
+needs to know whether the run actually succeeded without reading every artifact.
+
+Before reporting `DONE`, confirm all of the following. Do not report `DONE`
+because the phases *ran* — confirm they *produced* what they were supposed to:
+
+1. **Every expected artifact exists and is non-empty** — `REQUIREMENTS.md`,
+   `design/`, `planning/TASK_PLAN.md`, code + tests, `reviews/`, `docs/`,
+   `SIGN_OFF.md`, `COMPLETION_REPORT.md`. A phase that emitted nothing has not
+   completed.
+2. **Quality gates actually passed, verified by running them** — the full test
+   suite, the linter, and any type checker. Report the real command output, not
+   a sub-agent's claim that it passed. In autonomous mode this is the only thing
+   standing in for human review.
+3. **No task is left in a retry/blocked state** in `ORCHESTRATOR_STATE.md`.
+4. **Lessons are captured** in `lessons/` for anything that went wrong, plus
+   every decision you made autonomously that a human would plausibly have
+   decided differently.
+5. **Merged as configured** (to the configured development branch — check
+   `WORKFLOW_CONFIG.md`, it is not always `develop`), and **not pushed** unless
+   the config or the human explicitly authorized it.
+
+**A `DONE` that is only accurate about what you thought to measure is how
+defects escape.** Real incidents from past runs: a run reported `DONE` with 115
+passing tests while shipping unreachable dead code, a data-loss bug in a
+file-rewriting path, and output that failed the tool's own validator. If you
+have not exercised the primary code path against realistic input, say so in
+`COMPLETION_REPORT.md` rather than implying it was verified.
+
+When finished:
+1. Output ONLY your status code as the last line.
+2. Do not write any text after the status code.
+3. Do not summarize, explain, or add closing remarks after the status.
+4. The status line must be the absolute last thing you output.
+
+Status codes:
+- `DONE` - workflow completed, all gates passed, work merged as configured
+- `BLOCKED needs: <description>` - cannot proceed; state which phase and why

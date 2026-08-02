@@ -70,9 +70,10 @@ be wired into a pre-commit hook or CI.
   (a log, not an agent).
 - `WORKFLOWS/*/PRIVATE/AGENTS/*` — opt-in via `--private`, since `AGENTS.md`
   makes these case-by-case. Linked under their frontmatter `name:` rather than
-  their filename, because private agent files are often generically named
-  (`orchestrator_agent.md` → `feature-development-orchestrator.md`) and the
-  `name:` is how they're actually invoked.
+  their filename, since the `name:` is how an agent is actually invoked, and a
+  file may be named differently (`feature_development_orchestrator.md` →
+  `feature-development-orchestrator.md` — same identity, snake_case on disk and
+  kebab-case as an agent name, per the `workflow-conventions` skill).
 
 Target directories are overridable for testing:
 `$PI_SKILLS_DIR` / `$PI_AGENTS_DIR`, else `$PI_AGENT_DIR/{skills,agents}`,

@@ -71,7 +71,7 @@ full feature workflow?") is cheaper than either mistake.
    **Workflow artifacts never go inside the code repo** — only actual code
    does. See `workflow-conventions` for this rule and the reasoning.
 4. **Hand off to the orchestrator**
-   (`WORKFLOWS/feature_development_workflow/PRIVATE/AGENTS/orchestrator_agent.md`),
+   (`WORKFLOWS/feature_development_workflow/PRIVATE/AGENTS/feature_development_orchestrator.md`),
    which coordinates all phases, spawns the other agents, and manages
    worktrees, state, and budget. Don't run the phases manually if the
    orchestrator can drive them.
@@ -114,7 +114,7 @@ ingest/lint split.
 
 - Workflow: `WORKFLOWS/feature_development_workflow/WORKFLOW.md`
 - Agent roster: `WORKFLOWS/feature_development_workflow/AGENTS.md`
-- Orchestrator: `WORKFLOWS/feature_development_workflow/PRIVATE/AGENTS/orchestrator_agent.md`
+- Orchestrator: `WORKFLOWS/feature_development_workflow/PRIVATE/AGENTS/feature_development_orchestrator.md`
 - Layout: `WORKFLOWS/feature_development_workflow/FOLDER_STRUCTURE.md`
 - Templates: `WORKFLOWS/feature_development_workflow/templates/`,
   `CONFIG_TEMPLATE.md`, `LOCATIONS_TEMPLATE.md`

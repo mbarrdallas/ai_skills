@@ -18,7 +18,7 @@ Phase 7: Sign-off    → orchestrator reviews
 ## Agent Roles
 
 ### Orchestrator (Private)
-**Location:** `PRIVATE/AGENTS/orchestrator_agent.md`
+**Location:** `PRIVATE/AGENTS/feature_development_orchestrator.md`
 **Model:** Opus
 **Role:** Coordinate entire workflow, manage parallel tasks, track state and budget.
 **Spawns:** All other agents

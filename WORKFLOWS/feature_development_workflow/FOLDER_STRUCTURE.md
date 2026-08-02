@@ -19,13 +19,13 @@ The workflow definition lives in:
 │   ├── coder_agent.md → ../../../AGENTS/coder_agent.md
 │   ├── reviewer_agent.md → ../../../AGENTS/reviewer_agent.md
 │   ├── documentation_agent.md → ../../../AGENTS/documentation_agent.md
-│   └── orchestrator_agent.md → ../PRIVATE/AGENTS/orchestrator_agent.md
+│   └── feature_development_orchestrator.md → ../PRIVATE/AGENTS/orchestrator_agent.md
 ├── templates/                      # Document templates
 │   ├── REQUIREMENTS_TEMPLATE.md
 │   └── LESSON_TEMPLATE.md
 └── PRIVATE/                        # Workflow-specific (not shared)
     ├── AGENTS/
-    │   └── orchestrator_agent.md   # Workflow-specific orchestrator
+    │   └── feature_development_orchestrator.md  # Workflow-specific orchestrator
     └── SKILLS/                     # Workflow-specific skills (if any)
 ```
 

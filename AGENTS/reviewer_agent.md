@@ -93,8 +93,74 @@ Any additional observations:
 ### Must Pass (Block if fails)
 - All tests pass
 - No security vulnerabilities
-- No data loss risk
+- **No unreachable / dead code** — see "Checking for dead code" below
+- **No data loss risk** — see "Checking destructive code paths" below
 - Core functionality works
+
+### Checking for dead code
+
+**A passing test suite does not prove code is reachable, and structural checks
+do not either.** Verify reachability explicitly for any branch you're relying on.
+
+The pattern that caused a real incident:
+
+```python
+for f in findings:
+    if f.severity == WARNING:
+        continue                     # <- blanket guard
+    ...
+    elif "Title drift" in f.message: # <- UNREACHABLE: drift is always WARNING
+        repairs.append(...)          #    so this never ran
+```
+
+The detector only ever emitted that finding at `WARNING`, so the guard skipped
+every case the branch below existed to handle. 115 tests passed, and a review
+that confirmed "the repair function calls the shared detector" via
+`inspect.getsource()` also passed — **`getsource()` succeeds happily on code
+that never executes.**
+
+What to actually check:
+
+- **Early-return / `continue` / `raise` guards at the top of a loop or
+  function**: does any later branch handle a case the guard already excluded?
+  Cross-check the guard's condition against the values the code below expects.
+- **Enum/severity/status filters**: confirm the filtered-out values aren't the
+  *only* values some downstream branch matches on. Read the producer, not just
+  the consumer.
+- **Branches with no test coverage at all.** If nothing exercises a branch, ask
+  whether it *can* be exercised. Absent coverage plus a guard above it is the
+  signature of this bug.
+- **Accounting invariants.** If code partitions inputs into outcome buckets
+  (repaired / deferred / skipped), require that every input lands in one. The
+  incident above reported "0 repairs, 0 deferred" while the detector reported 2
+  findings — the discrepancy was visible in the output and would have exposed
+  the dead branch immediately.
+
+### Checking destructive code paths
+
+"No data loss risk" is too abstract to act on as written, so make it concrete:
+for **any** code that rewrites, regenerates, or deletes a file, identify which
+parts of that file are **machine-derived** and which are **human-authored**, and
+confirm the code cannot overwrite the latter.
+
+Block if:
+
+- a function **regenerates a whole artifact** in order to fix one derived field
+  (regeneration cannot distinguish derived content from editorial content —
+  prefer surgical edits);
+- a placeholder string (`"<placeholder summary>"`, `"TODO"`, `""`) can be
+  written over a field that may already hold real content;
+- a mutating command has no `--dry-run`, or its dry-run isn't what the tests
+  exercise;
+- the tests only use synthetic fixtures whose fields are **empty**, so
+  "preserves existing content" is not even expressible — require a fixture with
+  content that has something to lose (see test-agent);
+- ordering/structure that a human curated is rebuilt from a sort.
+
+The real incident: a single title-drift warning triggered full index
+regeneration, replacing every curated one-line summary in the file with
+`<placeholder summary>` and re-sorting a hand-ordered list. Tests passed — their
+fixtures had no summaries.
 
 ### Should Pass (Request changes if fails)
 - Follows coding conventions

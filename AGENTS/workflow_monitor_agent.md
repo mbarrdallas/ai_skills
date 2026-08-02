@@ -68,7 +68,7 @@ manufacturing findings from nothing.
   — real waiting/blocking incidents, deviations, retries.
 - `orchestrator/BUDGET.md`, `orchestrator/METRICS.md`, `orchestrator/ERRORS.md`,
   `SIGN_OFF.md`, `COMPLETION_REPORT.md` — the orchestrator's own documented
-  output list (per `feature_development_workflow`'s `orchestrator_agent.md`
+  output list (per `feature_development_workflow`'s `feature_development_orchestrator.md`
   "Your Outputs"). **Missing ones are themselves a finding** — either this
   run skipped producing them (a real Jidoka/Inventory gap: budget/error
   tracking didn't happen, or wasn't preserved), not just a theoretical gap.
